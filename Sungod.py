@@ -1,9 +1,10 @@
     # -*- coding: utf-8 -*-
-import irc.client as irclib
 
 import sys
 import traceback
 import os
+sys.path.append(os.path.join("libs","external"))
+
 import pickle as cPickle #@UnusedImport HAHAHHAHAH LEARN TO USE IMPORTS PROPERLY
 import random
 import datetime
@@ -12,20 +13,20 @@ import urllib
 import shelve
 import time
 import feedparser
-import time
 from collections import deque
 
+import irc.client as irclib
 
 from BeautifulSoup import BeautifulSoup
 import wikipedia
 
 #from libs.external import ConfigParser
 import ConfigParser #should be in external 
-from libs.external import html2text
+import html2text
 
 from libs import PyNify
 import libs.arena as arena
-import libs.reddit as reddit
+#import libs.reddit as reddit
 import math
 
 print arena
@@ -94,7 +95,7 @@ pie_jokes = (
 
 connection_info = {
         "network":config.get("connection","network"),
-        "port":config.get("connection","port"),
+        "port":int(config.get("connection","port")),
         "channel":config.get("connection","channel"),
         "nick":config.get("connection","nick"),
         "name":config.get("connection","name"),
@@ -1258,13 +1259,13 @@ def handlePubMessage(connection,event):
     if not stats["users"][speaker].checked_notes:
         stats["users"][speaker].checked_notes = True
     
-    m = re_math.match(message)
-    if m:
-        try:
-            answer = eval(message,{f:getattr(math,f) for f in dir(math)})
-            say(answer,event.target)
-        except:
-            pass
+    # m = re_math.match(message)
+    # if m:
+    #     try:
+    #         answer = eval(message,{f:getattr(math,f) for f in dir(math)})
+    #         say(answer,event.target)
+    #     except:
+    #         pass
         
     link = htmlre.search(message)
     try:
@@ -1911,7 +1912,7 @@ def auto_save():
     delay = stats["autosave_interval"]
     if stats["arena_enabled"]:
         arena.save_heroes()
-    reddit.start()
+    #reddit.start()
 
     irc.execute_delayed(delay, auto_save)
 
