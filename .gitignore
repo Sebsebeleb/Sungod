@@ -33,3 +33,8 @@ nosetests.xml
 .mr.developer.cfg
 .project
 .pydevproject
+
+# No sensetive data here!
+conf.ini
+stats.db
+stats/
