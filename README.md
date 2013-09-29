@@ -1,0 +1,4 @@
+Sungod
+======
+
+Sungod IRC bot
