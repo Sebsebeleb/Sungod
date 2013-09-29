@@ -12,14 +12,13 @@ import re
 import urllib
 import shelve
 import time
-import feedparser
 from collections import deque
+import threading
 
 import irc.client as irclib
-
+import feedparser
 from BeautifulSoup import BeautifulSoup
 import wikipedia
-
 #from libs.external import ConfigParser
 import ConfigParser #should be in external 
 import html2text
@@ -28,8 +27,6 @@ from libs import PyNify
 import libs.arena as arena
 #import libs.reddit as reddit
 import math
-
-print arena
 
 htmlre = re.compile(r"\S+\.\S+") #shouldn't these be wrapped in an anymous, self-referencing function call?
 spotre = re.compile(r"spotify:track:([A-Za-z0-9]{22})")#
@@ -2020,6 +2017,17 @@ def initiate_irc():
                 #save_settings()
                 raise
 
+def initiate_cli():
+    def f():
+        i = raw_input("q to quit> ")
+        if i == "q":
+            pass
+        else:
+            exec(i) in globals(), locals()
+            f()
+    t = threading.Thread(target=f)
+    t.start()
+
 
 if __name__ == "__main__":
 
@@ -2030,8 +2038,10 @@ if __name__ == "__main__":
     except Exception as e:
         print "Loading settings failed; ", e
         raise
+    initiate_cli()
     initiate_irc()
     save_settings()
+    
 
 
 
