@@ -691,6 +691,7 @@ class Restart(basecmd):
         print "HELLO"
         proc = sys.executable
         server.disconnect()
+        call(["git", "pull", "origin"])
         os.execl(proc, proc, * sys.argv)
         
 
