@@ -14,6 +14,7 @@ import shelve
 import time
 from collections import deque
 import threading
+from subprocess import call
 
 import irc.client as irclib
 import feedparser
@@ -296,17 +297,17 @@ class Get(basecmd):
         s = u = None
         if len(args) == 2:
             u,s = args
-        elif len(args) == 21:
-            s = args
+        elif len(args) == 1:
+            s = args[0]
         else:
             say("Sorry, I need 1 or 2 arguments", event.target)
 
         if u:
             obj = stats["users"][u]
+            atr = getattr(obj, s)
         else:
             obj = stats
-
-        atr = getattr(obj, s)
+            atr = stats[s]
         
         say(atr, event.target)
     
@@ -1900,8 +1901,8 @@ def save_error(error):
     """
     Todo: figuring out bloody file paths
     """
-#    f = open(os.path.join(os.getcwd(),"debug/crash.txt"), "w")
-#    f.write(str(error))
+    f = open(os.path.join("debug","crash.txt"), "w")
+    f.write(str(error))
     pass
 
 def auto_save():
@@ -2003,13 +2004,12 @@ def initiate_irc():
     
     while True:    
         try:
-            print "hello?"
             irc.process_forever()
         except Exception as e:
 
             stats["error"] = e.message
             if stats["immortal"] == True:
-                server.privmsg(connection_info["channel"], "YOU CANNOT KILL ME, FOOL. I AM IMMORTAL HAHAHA!")
+                #server.privmsg(connection_info["channel"], "YOU CANNOT KILL ME, FOOL. I AM IMMORTAL HAHAHA!")
                 print "----Error occured----"
                 print traceback.format_exc()
                 print "---------------------"
@@ -2039,7 +2039,7 @@ if __name__ == "__main__":
     except Exception as e:
         print "Loading settings failed; ", e
         raise
-    initiate_cli()
+    #initiate_cli()
     initiate_irc()
     save_settings()
     
