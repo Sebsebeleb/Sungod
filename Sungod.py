@@ -1419,9 +1419,10 @@ def handlePubMessage(connection,event):
                                                "morning", "hey", "hola",
                                                "greetings","top of the morning"] ):
             connection.privmsg(event.target, "Hello to you " + speaker + "!")
-            
-            connection.privmsg
-            
+
+        elif any(" ".join(msg).startswith(d) for d in ["thank you","thanks", "ty", "arigato"] ):
+            connection.privmsg(event.target, "You are welcome smallsun")
+
         elif " ".join(msg).lower() in ["i hate you sungod!", "I hate sungod","i love nekro", "i love nekromans", "xd","nekro<3"]:
             stats["users"]["Frets"].sin += 1
 
