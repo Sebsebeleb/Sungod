@@ -1222,8 +1222,6 @@ def update_stats(message, speaker):
     
 
 def handlePubMessage(connection,event):
-    print event
-    print dir(event)
     if event.target == "#sunfields" and stats["arena_enabled"]:
         arena.on_msg(connection,event)
         return
