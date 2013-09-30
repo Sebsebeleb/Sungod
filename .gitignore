@@ -38,3 +38,4 @@ nosetests.xml
 conf.ini
 stats.db
 stats/
+libs/
