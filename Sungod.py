@@ -21,11 +21,12 @@ import feedparser
 from BeautifulSoup import BeautifulSoup
 import wikipedia
 #from libs.external import ConfigParser
-import ConfigParser #should be in external 
+import ConfigParser #should be in external
 import html2text
 
 from libs import PyNify
-import libs.arena as arena
+from libs import arena
+from libs import math_parse
 #import libs.reddit as reddit
 import math
 
@@ -198,18 +199,18 @@ class basecmd():
 
     def __repr__(self):
         return "%s:%s"%(self.trigger,self.powerreq)
-    
+
 class Ninjafy(basecmd):
     type = "pub"
     trigger = "ninjafy"
-    
+
     mapping = {"a":"ka","b":"zu","c":"mi",
    "d":"te","e":"ku","f":"lu","g":"ji",
    "h":"ri","i":"ki","j":"zu","k":"me","l":"ta",
    "m":"rin","n":"to","o":"mo","p":"no","q":"ke",
    "r":"shi","s":"ari","t":"chi","u":"do","v":"ru","w":"mei",
    "x":"na","y":"fu","z":"zi"," ":" ", "?":"??"}
-    
+
     def do(self,args,connection,event):
         name = " ".join(args)
         name = [i.lower() in self.mapping.keys() and i.lower() or "?" for i in name]
@@ -224,16 +225,16 @@ class wobHere(basecmd):
 class Week(basecmd):
     type = "pub"
     trigger = "week"
-    
+
     def do(self,args,connection,event):
         week = datetime.date.today().isocalendar()[1]
         connection.privmsg(event.target,"The current week is: " + str(week) + ", aka "+["B","A"][week%2]+"-uke.")
-        
+
 class Pynify(basecmd):
     """(url), returns a short url"""
     type = "pub"
     trigger = "tinyfy"
-    
+
     def do(self,args,connection,event):
         try:
             result = PyNify.tinyfy("".join(args))
@@ -308,9 +309,9 @@ class Get(basecmd):
         else:
             obj = stats
             atr = stats[s]
-        
+
         say(atr, event.target)
-    
+
 class JoinChan(basecmd):
     """(#channel), Joins the specified channel"""
     trigger = "join"
@@ -401,7 +402,7 @@ class RandomQuote(basecmd):
     def do(self, args, connection, event):
         print "Sorry, I no longer track your actions."
         return
-    
+
         if len(args) > 1:
             try: n = int(args[1])
             except ValueError:
@@ -504,7 +505,7 @@ class DFmoral(basecmd):
 #            print "EMMMM: ", m,"\n\n\n"
 #            if m:
         match = rex.search(site)
-        if match:        
+        if match:
             connection.privmsg(event.target,match.groups()[0])
             return
         else:
@@ -653,7 +654,7 @@ class Timer(basecmd):
                 f = 60*60*24*32
             elif any([a.endswith(n) for n in ["y","year","years"]]):
                 f = 60*60*24*32*12
-            delay += i * f 
+            delay += i * f
 
         trigger_date = datetime.datetime.now() + datetime.timedelta(0,delay)
         if who == speaker:
@@ -687,14 +688,14 @@ class GetError(basecmd):
 
 class Restart(basecmd):
     trigger = "restart"
-    
+
     def do(self, args, connection, event):
         print "HELLO"
         proc = sys.executable
         server.disconnect()
         call(["git", "pull", "origin"])
         os.execl(proc, proc, * sys.argv)
-        
+
 
 
 class RPS(basecmd):
@@ -711,7 +712,7 @@ class RPS(basecmd):
         Player(req), player to challenge
         Rounds(1), rounds to play
         """
-        
+
         if self.active:
             connection.privmsg(event.target, "Sorry, another game is already going on")
             return
@@ -727,7 +728,7 @@ class RPS(basecmd):
         except Exception as e:
             print e
             connection.privmsg(event.target, "I do not understand")
-            
+
         self.active = True
         irc.add_global_handler("pubmsg",self.on_talk, -1)
         irc.execute_delayed(self.TIMEOUT,self._deactivate, [event.target])
@@ -753,7 +754,7 @@ class RPS(basecmd):
             self.answers = {}
 
     def on_talk(self, connection, event):
-        
+
         msg =  event.arguments[0]
         speaker = event.source.split('!') [0].lower()
         if speaker in self.players_wait and msg in ["1","2","3"]:
@@ -810,18 +811,18 @@ class Exec(basecmd):
     powerreq = 1
 
     def do(self, args, connection,event):
-        command = " ".join(args)    
+        command = " ".join(args)
         print command
         try:
             exec(command)
         except Exception as e:
             connection.privmsg(event.target, "You are talking unclear.")
             print e
-            
+
 class Python(basecmd):
     trigger = "python"
     powerreq = 50
-    
+
     def do(self,args,connection,event):
         try:
             equation = " ".join(event.arguments[0].split(" ")[2:])
@@ -829,7 +830,7 @@ class Python(basecmd):
                 result = "Don't you dare, dear!"
             result = eval(equation)
         except Exception as e:
-    
+
             result = "Sorry, error: ", e[:30]
         if result:
             connection.privmsg(event.target,result)
@@ -968,7 +969,7 @@ class Top(basecmd):
             l = [i for i in reversed(l)]
 
         l = l[:n]
-        
+
         title = "Top " + stat + " of " + event.target + ":"
         connection.privmsg(event.target, title.center(len(title)+12," ").center(55,"*"))
         if reverse:
@@ -1000,7 +1001,7 @@ class RSS(basecmd):
     def delete(self,link):
         stats["rss"]["feeds"].remove(link)
     cmds = {"add":add,"delete":delete}
-    
+
 class UConvert(basecmd):
     """
     create_system name unitscale scaletype
@@ -1008,13 +1009,13 @@ class UConvert(basecmd):
     convert value from_unit to_unit
     """
     trigger = "convert"
-    
+
     def do(self,args,connection,event):
         try:
             result = unitconversion_middleway.do(args)
         except Exception as e:
             connection.privmsg(event.target, "Error: " + str(e))
-        if result: 
+        if result:
             s = "%s %s is %s %s"%(args[1],result[1].long_name,result[0],result[2].long_name)
         else:
             s = "Succesfully executed command"
@@ -1051,10 +1052,10 @@ builtincmds = [Statsmanip, JoinChan, PartChan, Query, Quote, DisplayHelp,
                 wob, Week, Wikipedia, wobHere]
 
 class Hooks():
-    
+
     temp_hooks = {}
     perma_hooks = []
-    
+
     @classmethod
     def handle(cls,connection,event):
         """
@@ -1063,18 +1064,18 @@ class Hooks():
         """
         #print "temp hooks: ",cls.temp_hooks
         #print "perma hooks: ",cls.perma_hooks
-        
+
         for i in cls.temp_hooks.keys():
             b = i(connection,event,cls.temp_hooks[i])
             if b:
                 del cls.temp_hooks[i]
                 return b
-        
+
         for i in cls.perma_hooks:
             b = i(connection,event)
             if b:
                 return b
-            
+
     @classmethod
     def remove_hook(cls,hook):
         print "Removing hook: ", hook
@@ -1083,15 +1084,15 @@ class Hooks():
             print "It was in temp hooks"
         elif hook in cls.perma_hooks():
             cls.perma_hooks.remove(hook)
-            
+
     @classmethod
     def register_hook(cls,function,timeout = None, arguments = []):
         print "I am registering hook for you."
         print function,timeout
         cls.temp_hooks[function] = arguments
         print cls.temp_hooks
-            
-    @classmethod    
+
+    @classmethod
     def register_perma_hook(cls,function):
         cls.perma_hooks.append(function)
 
@@ -1103,17 +1104,17 @@ class Hooks():
 def you_asked_memory(connection,event,asker):
     speaker = event.source.split('!') [0]
     message = event.arguments[0]
-    
+
     if speaker == asker:
         sungod_says(message, connection, event, speaker)
         return True
     else:
         return False
-    
+
 def say(message, channel = connection_info["channel"]):
     connection_info["server"].privmsg(channel, message)
-    
-    
+
+
 def handleJoin(connection, event):
     """
     Triggered when someone joins a channel?
@@ -1139,14 +1140,14 @@ def handleJoin(connection, event):
             say("You have new notes, "+joiner+"! "+r"http://bbg.terminator.net/desknotes/notes/%s.txt"%joiner,event.target)
             #stats["users"][joiner].checked_notes = True
     print "|----ON JOIN GOODBYE-----|"
-                 
+
 
 def handlePrivMessage(connection, event):
     speaker = event.source.split("!")[0]
     msg = event.arguments[0]
     tim = time.strftime("[%H:%M:%S]")
     print tim +'"'+speaker+'": '+ msg
-    
+
 
 
 """def handlePrivMessage(connection, event):
@@ -1185,7 +1186,7 @@ def handlePrivMessage(connection, event):
 class Substitution():
     last = re.compile(r"last (\w+)")
     last_talker = re.compile(r"last_talker")
-    
+
     @classmethod
     def convert(cls,s):
         print "Converting: ", s
@@ -1194,21 +1195,21 @@ class Substitution():
         match = cls.last.match(s)
         if match:
             for i in log:
-                print "DEBUG: i: ", i   
+                print "DEBUG: i: ", i
                 if i[1] == match.groups()[0]:
                     print "IS! ", i
                     return i[0] + " " + i[1] + ": " + i[2]
-                
+
         match = cls.last_talker.match(s)
         if match:
             return log[-1][1]
-            
-        
+
+
         log.reverse()
         if result:
             return result
-    
-    
+
+
 def wiseWordsOfTheDay():
     wise = []
 
@@ -1219,7 +1220,7 @@ def update_stats(message, speaker):
     if teutre.search(message):
         user.batness += 1
     user.crossdressness += len(re_crossdress.findall(message))
-    
+
 
 def handlePubMessage(connection,event):
     if event.target == "#sunfields" and stats["arena_enabled"]:
@@ -1238,10 +1239,10 @@ def handlePubMessage(connection,event):
     if "/bbgdump" in message:
         m = message.split("/bbgdump")[1].strip(" ")
         connection.privmsg(event.target,"http://bbg.terminator.net/media/dumps/"+m)
-    
+
     l = message.split()
     message = " ".join([re.match(r"%(\w|_| )+%",i) and Substitution.convert(i)or i for i in l])
-    
+
     global log
     log.append((time_stamp,speaker,message))
 
@@ -1252,18 +1253,15 @@ def handlePubMessage(connection,event):
 
     else:
         stats["users"][speaker].lines += 1
-    
+
     if not stats["users"][speaker].checked_notes:
         stats["users"][speaker].checked_notes = True
-    
-    # m = re_math.match(message)
-    # if m:
-    #     try:
-    #         answer = eval(message,{f:getattr(math,f) for f in dir(math)})
-    #         say(answer,event.target)
-    #     except:
-    #         pass
-        
+
+    m = re_math.match(message)
+    if m:
+        result = math_parse.parse(message)
+        say(result, event.target)
+
     link = htmlre.search(message)
     try:
         if link:
@@ -1283,7 +1281,7 @@ def handlePubMessage(connection,event):
                 connection.privmsg(event.target,"'"+title[:stats["PEEKMAXTITLE"]]+"'")
     except:
         pass
-    
+
     spot = spotre.search(message)
     try:
         if spot:
@@ -1308,16 +1306,16 @@ def handlePubMessage(connection,event):
                     connection.privmsg(event.target,"" + str(song[0])+" by "+str(artist[0]) + tubeOut)
     except:
         print "Spotify is bad."
-        
+
     print event.target + '> ' + speaker + ': ' +  event.arguments [0]
 
     #adds statistics
     update_stats(message,speaker)
-        
+
     #Handle hooks
     if Hooks.handle(connection,event):
         return
-    
+
     #LEARN!
     knowledge = re_because.search(message)
     if knowledge: #then POWER
@@ -1337,16 +1335,16 @@ def handlePubMessage(connection,event):
 
     elif message.lower() == "no" and speaker.lower() == "blam":
         connection.privmsg(event.target, "http://bbg.terminator.net/no.mp3")
-        
+
     elif message.lower() == "right" and speaker.lower() == "blam":
         connection.privmsg(event.target, "http://bbg.terminator.net/right.mp3")
-        
+
     elif message.lower() == "absolutely" and speaker.lower() == "blam":
         connection.privmsg(event.target, "http://bbg.terminator.net/absolutely.mp3")
-        
+
     elif message.lower() == "player" and speaker.lower() == "blam":
         connection.privmsg(event.target, "http://bbg.terminator.net/playah.mp3")
-        
+
     elif "thai hoe" in message.lower() and speaker.lower() == "blam":
         connection.privmsg(event.target, "http://bbg.terminator.net/thai_hoe.mp3")
 
@@ -1435,7 +1433,7 @@ def handlePubMessage(connection,event):
         s = " ".join(message.split(" ")[:-1])
         s = s.rstrip(",")
         if message[-1] in ["!","?"]:
-            s += message[-1] 
+            s += message[-1]
         sungod_says(s,connection,event,speaker)
     else:
         pass
@@ -1447,7 +1445,7 @@ def handlePubMessage(connection,event):
 def sungod_says(msg, connection, event, speaker):
     answer = "You make no sense"
     raw_str = msg.split(" ")
-    
+
     if raw_str[0] == connection_info["prefix"]:
         raw_str = raw_str[1:]
     elif raw_str[0].startswith(connection_info["prefix"]) and raw_str[0][len(connection_info["prefix"])] in [".",",","?","!"]:
@@ -1458,7 +1456,7 @@ def sungod_says(msg, connection, event, speaker):
     raw_str = raw_str.strip()
     print "raw_str: ", raw_str
     print "Raw string is: '" + raw_str +"'"
-    
+
     if raw_str == "what is a man?":
         answer = "A miserable pile of secrets. But enough talk... Have at you!"
     elif raw_str == "what is w0bni doing?":
@@ -1513,7 +1511,7 @@ def sungod_says(msg, connection, event, speaker):
             answer = "I will make sure "+str(to)+" gets the message!"
         else:
             answer = "Nothing went wrong, yet something went wrong. The bokk is a mysterious item."
-            
+
     elif " has commited a crime!" in raw_str:
         court(raw_str.split()[1],raw_str,event.target)
         return
@@ -1537,15 +1535,15 @@ def sungod_says(msg, connection, event, speaker):
                 i += 1
             elif word.endswith(","):
                 i += 1
-                
+
         choices = [w for w in raw_str.split() if not w == "or"]
         if not len(choices) == 2:
             choices = choices[len(choices)-i-1:]
         for e,i in enumerate(choices):
             choices[e] = i.rstrip(",")
-            
+
         choices[-1] = choices[-1].rstrip("?")
-            
+
         print choices
         res = random.choice(choices)
         answer = "Hmmm... hard choice but I choose " + res
@@ -1600,13 +1598,13 @@ def sungod_says(msg, connection, event, speaker):
                 if i not in u and i != speaker.lower():
                     u.append(i)
             answer = "You must walk to the " + \
-            random.choice(["shapell","shursh","far away tribe", "bat cave","place where the sun never sets", 
+            random.choice(["shapell","shursh","far away tribe", "bat cave","place where the sun never sets",
                            "fishes", "room of the great warm bokk","place where the fishes live"]) +\
                            ", " +\
                 random.choice(["there you will find", "there you must search for", "and kill", ", and you must battle to death with",
                                ", and you must dance with"])+\
                               " "+ u[0] + " " +\
-                random.choice(["under the tree","inside the room with my symbol", "inside a box", "next to the great warm bokk", 
+                random.choice(["under the tree","inside the room with my symbol", "inside a box", "next to the great warm bokk",
                                "in the water", "inside the secret room"]) +\
                 ". He will guide you to " + u[1] + " and he will have your answer."
         elif method in [6,7,8]:
@@ -1795,7 +1793,7 @@ def court(speaker,message,chn):
     if speaker.lower() in [s.lower() for s in stats["users"].keys()]:
         faithful_cap = 0.06
         evil_cap = 0.04
-        
+
         total_faith = sum([math.sqrt(f) for f in [u.faith for u in stats["users"].values()]])
         speaker_faith = math.sqrt(stats["users"].get(speaker).faith)
         if math.sqrt(speaker_faith) > total_faith * faithful_cap:
@@ -1809,7 +1807,7 @@ def court(speaker,message,chn):
             say(s,chn)
         else:
             say("I knew " + speaker + " was up to no good! Please, let us settle this.",chn)
-        
+
     else:
         say("Bring him here, now! And I shall pass my judgement.",chn)
 
@@ -1847,7 +1845,7 @@ def load_commands(cmd):
                 print "WARNING: A command with trigger '" + c.trigger + "' already exists. Ignoring."
             else:
                 pubcommands[c.trigger] = c()
-                
+
 def load_hooks():
     import pkgutil
     import os
@@ -1895,7 +1893,7 @@ def load_settings(config = "stats.db"):
     s.close()
     print len(stats.items())
     print "Succesfully loaded!"
-    
+
 def save_error(error):
     """
     Todo: figuring out bloody file paths
@@ -1992,7 +1990,7 @@ def initiate_irc():
     #rss_check()
     #irc.execute_delayed(stats["rss"]["interval"],auto_rss_check)
     irc.execute_delayed(stats["rss"]["interval"], auto_git_check)
-    
+
     print connection_info["nickservpass"]
     server.privmsg("nickserv", connection_info["nickservpass"])
     print "Server is:",server
@@ -2000,8 +1998,8 @@ def initiate_irc():
         arena.init(server)
 
     # Jump into an infinite loop
-    
-    while True:    
+
+    while True:
         try:
             irc.process_forever()
         except Exception as e:
@@ -2041,7 +2039,7 @@ if __name__ == "__main__":
     #initiate_cli()
     initiate_irc()
     save_settings()
-    
+
 
 
 
