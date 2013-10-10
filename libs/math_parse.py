@@ -1,7 +1,6 @@
 import ast
 
-allowed = (ast.Num, ast.Str, ast.List, ast.Tuple, ast.Set, ast.Dict,
-           ast.Ellipsis, ast.Expression,
+allowed = (ast.Num, ast.Str, ast.List, ast.Tuple, ast.Dict, ast.Expression,
            ast.UnaryOp, ast.BinOp, ast.BoolOp, ast.Compare,
            ast.Eq, ast.NotEq, ast.Lt, ast.LtE, ast.Gt, ast.GtE, ast.Is,
            ast.IsNot, ast.In, ast.NotIn,
