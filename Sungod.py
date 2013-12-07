@@ -1359,7 +1359,8 @@ def handlePubMessage(connection, event):
     m = re_math.match(message)
     if m:
         result = math_parse.parse(message)
-        say(result, event.target)
+        if result:
+            say(result, event.target)
 
     link = htmlre.search(message)
     try:
