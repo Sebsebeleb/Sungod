@@ -14,6 +14,7 @@ def parse(string):
     tree = ast.parse(string, mode='eval')
     nodes = list(ast.walk(tree))  # Shouldn't this be "climb(tree)" instead?
     print nodes
+    s = None
     if all((type(i) in allowed for i in nodes)):
         s = eval(compile(tree, filename="<ast>", mode="eval"))
-    return s
+    return s 
