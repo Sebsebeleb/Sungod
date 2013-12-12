@@ -1393,8 +1393,8 @@ def handlePubMessage(connection, event):
     if spot:
         spot = spot.groups()
         url = "http://ws.spotify.com/lookup/1/.json?uri=spotify:track:"+spot[0]
-        track_data = json.loads(urllib.urllopen(url))
-        artists = [a.get("name") for a in d.get("track").get("artists")]
+        track_data = json.load(urllib.urlopen(url))
+        artists = [a.get("name") for a in track_data.get("track").get("artists")]
         song = track_data.get("track").get("name")
 
         tags = song.split(" ")
@@ -1410,7 +1410,7 @@ def handlePubMessage(connection, event):
             tubeOut = " (http://youtu.be/"+getTube.split(
                 "watch?v=")[1].split("&amp")[0]+")"
             connection.privmsg(event.target, "" + str(
-                song[0])+" by "+str(artist[0]) + tubeOut)
+                song)+" by "+", ".join(artists) + tubeOut)
 
     print event.target + '> ' + speaker + ': ' + event.arguments[0]
 
