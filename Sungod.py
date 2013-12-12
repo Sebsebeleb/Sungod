@@ -1388,34 +1388,28 @@ def handlePubMessage(connection, event):
         pass
 
     spot = spotre.search(message)
-    try:
-        if spot:
-            spot = spot.groups()
-            url = "http://open.spotify.com/track/"+spot[0]
-            getInfo = urllib.urlopen(url)
-            sup = BeautifulSoup(getInfo)
-            if 'find that' in str(sup):
-                connection.privmsg(
-                    event.target, "That is _so_ not a working spotify URI.")
+    if spot:
+        spot = spot.groups()
+        url = "http://ws.spotify.com/lookup/1/.json?uri=spotify:track:"+spot[0]
+        track_data = json.loads(urllib.urllopen(url))
+        artists = [a.get("name") for a in d.get("track").get("artists")]
+        song = track_data.get("track").get("name")
+
+        else:
+            tags = song.split(" ")
+            ulink = 'https://gdata.youtube.com/feeds/api/videos?orderby=viewCount&q=' + \
+                "+".join(tags)
+            getTube = urllib.urlopen(ulink).read()
+            countRes = getTube.split("totalResults>")[1].split("</")[0]
+            if countRes == "0":
+                tubeOut = ""
+            # elif artist in getTube: helt serr, få inn denne - det blir
+            # kung. Statistikk basert på 2 testsøk viser det!
             else:
-                artist = artre.findall(str(sup))
-                song = songre.findall(str(sup))
-                tags = song[0].split(" ")
-                ulink = 'https://gdata.youtube.com/feeds/api/videos?orderby=viewCount&q=' + \
-                    "+".join(tags)
-                getTube = urllib.urlopen(ulink).read()
-                countRes = getTube.split("totalResults>")[1].split("</")[0]
-                if countRes == "0":
-                    tubeOut = ""
-                # elif artist in getTube: helt serr, få inn denne - det blir
-                # kung. Statistikk basert på 2 testsøk viser det!
-                else:
-                    tubeOut = " (http://youtu.be/"+getTube.split(
-                        "watch?v=")[1].split("&amp")[0]+")"
-                    connection.privmsg(event.target, "" + str(
-                        song[0])+" by "+str(artist[0]) + tubeOut)
-    except:
-        print "Spotify is bad."
+                tubeOut = " (http://youtu.be/"+getTube.split(
+                    "watch?v=")[1].split("&amp")[0]+")"
+                connection.privmsg(event.target, "" + str(
+                    song[0])+" by "+str(artist[0]) + tubeOut)
 
     print event.target + '> ' + speaker + ': ' + event.arguments[0]
 
