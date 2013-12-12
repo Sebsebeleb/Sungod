@@ -29,6 +29,7 @@ from libs import arena
 from libs import math_parse
 # import libs.reddit as reddit
 import math
+import json
 
 htmlre = re.compile(
     r"\S+\.\S+")  # shouldn't these be wrapped in an anymous, self-referencing function call?
