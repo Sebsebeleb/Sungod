@@ -755,6 +755,7 @@ class GetError(basecmd):
 
 
 class Restart(basecmd):
+    powerreq = 3
     trigger = "restart"
 
     def do(self, args, connection, event):
