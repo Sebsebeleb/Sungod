@@ -1396,21 +1396,20 @@ def handlePubMessage(connection, event):
         artists = [a.get("name") for a in d.get("track").get("artists")]
         song = track_data.get("track").get("name")
 
+        tags = song.split(" ")
+        ulink = 'https://gdata.youtube.com/feeds/api/videos?orderby=viewCount&q=' + \
+            "+".join(tags)
+        getTube = urllib.urlopen(ulink).read()
+        countRes = getTube.split("totalResults>")[1].split("</")[0]
+        if countRes == "0":
+            tubeOut = ""
+        # elif artist in getTube: helt serr, få inn denne - det blir
+        # kung. Statistikk basert på 2 testsøk viser det!
         else:
-            tags = song.split(" ")
-            ulink = 'https://gdata.youtube.com/feeds/api/videos?orderby=viewCount&q=' + \
-                "+".join(tags)
-            getTube = urllib.urlopen(ulink).read()
-            countRes = getTube.split("totalResults>")[1].split("</")[0]
-            if countRes == "0":
-                tubeOut = ""
-            # elif artist in getTube: helt serr, få inn denne - det blir
-            # kung. Statistikk basert på 2 testsøk viser det!
-            else:
-                tubeOut = " (http://youtu.be/"+getTube.split(
-                    "watch?v=")[1].split("&amp")[0]+")"
-                connection.privmsg(event.target, "" + str(
-                    song[0])+" by "+str(artist[0]) + tubeOut)
+            tubeOut = " (http://youtu.be/"+getTube.split(
+                "watch?v=")[1].split("&amp")[0]+")"
+            connection.privmsg(event.target, "" + str(
+                song[0])+" by "+str(artist[0]) + tubeOut)
 
     print event.target + '> ' + speaker + ': ' + event.arguments[0]
 
