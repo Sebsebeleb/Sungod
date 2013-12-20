@@ -1144,12 +1144,23 @@ class Wikipedia(basecmd):
         s = s[:200]
         say(s, event.target)
 
+class TextPreview(basecmd):
+    trigger = "preview"
+
+    def do(self, args, connection, event):
+        from libs import TextPreview
+        
+        text = " ".join(args)
+        f = TextPreview.preview(text)
+        s = "http://bbg.terminator.net/media/previews/" + f
+        say(s, event.target)
+
 
 builtincmds = [Statsmanip, JoinChan, PartChan, Query, Quote, DisplayHelp,
               RandomQuote, TopSpeakers, DaysTG, Random, RPS, Exec, Get,
               Timer, Die, Spell, Charges, Dictionary, Top, DFmoral, RSS,
               UConvert, Pynify, Python, Ninjafy, gw2check, GetError, Restart, Time,
-              wob, Week, Wikipedia, wobHere]
+              wob, Week, Wikipedia, wobHere, TextPreview]
 
 
 class Hooks():
