@@ -17,13 +17,13 @@ def preview(text):
     font = ImageFont.truetype(font_fp, 40)
     text_size = font.getsize(text)
     size = (BORDER[0] + text_size[0], BORDER[1] + text_size[1])
-    img = Image.new("RGB", size, "white")
+    img = Image.new("RGB", size, (230,230,230))
     draw = ImageDraw.Draw(img)
     colour = random_colour()
-    draw.text((BORDER[0] / 2, BORDER[1] / 2), text, colour)
+    draw.text((BORDER[0] / 2, BORDER[1] / 2), text, colour, font=font)
 
 
-    fname = text[:10]+".png"  # Temp name giving
+    fname = slugify(text[:18])+".png"  # Temp name giving
     fp = os.path.abspath(os.path.join(
         os.path.expanduser("~seb"), "www", "bbg.terminator.net", "media", "previews", fname))
     img.save(fp)
@@ -38,3 +38,14 @@ def random_colour():
         # Require a 15% difference from pure white
         if (float(255 * 3) / sum(colour)) - 1 > 0.15:
             return colour
+
+def slugify(s):
+    """
+    Normalizes string, converts to lowercase, removes non-alpha characters,
+    and converts spaces to hyphens.
+    """
+    import unicodedata
+    s = unicode(s)
+    s = unicodedata.normalize('NFKD', value).encode('ascii', 'ignore')
+    s = unicode(re.sub('[-\s]+', '-', value))
+    return s
