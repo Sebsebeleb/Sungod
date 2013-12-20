@@ -47,6 +47,6 @@ def slugify(s):
     """
     import unicodedata
     s = unicode(s)
-    s = unicodedata.normalize('NFKD', value).encode('ascii', 'ignore')
-    s = unicode(re.sub('[-\s]+', '-', value))
+    s = unicodedata.normalize('NFKD', s).encode('ascii', 'ignore')
+    s = unicode(re.sub('[-\s]+', '-', s))
     return s
