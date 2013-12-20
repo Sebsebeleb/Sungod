@@ -12,7 +12,7 @@ def preview(text):
     text -- The text that will be drawn on the image
 
     """
-    font_fp = os.path.abspath(os.path.join(os.curdir, "COUR.TTF"))
+    font_fp = os.path.abspath(os.path.join("/", "COUR.TTF"))
     font = ImageFont.truetype(font_fp, 40)
     text_size = font.getsize(text)
     size = (BORDER[0] + text_size[0], BORDER[1] + text_size[1])
@@ -20,7 +20,7 @@ def preview(text):
     draw = ImageDraw.Draw(img)
     colour = random_colour()
     draw.text((BORDER[0] / 2, BORDER[1] / 2), text, colour)
-    font_mall = ImageFont.truetype(font_fp, 16)
+    
 
     fname = text[:10]+".png"  # Temp name giving
     fp = os.path.abspath(os.path.join(
