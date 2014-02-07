@@ -915,7 +915,7 @@ class Spell(basecmd):
     commands = ["set", "get"]
 
     def do(self, args, connection, event):
-        import enchant
+        from libs.external import enchant
 
         d = enchant.Dict(stats["spell_dict"])
         if args[0] in self.commands:
