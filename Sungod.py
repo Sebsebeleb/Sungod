@@ -1149,7 +1149,7 @@ class TextPreview(basecmd):
 
     def do(self, args, connection, event):
         from libs import TextPreview
-        
+
         text = " ".join(args)
         f = TextPreview.preview(text)
         s = "http://bbg.terminator.net/media/previews/" + f
@@ -1384,7 +1384,6 @@ def handlePubMessage(connection, event):
         if link:
             stats["users"][speaker].links += 1
             link = link.group()
-            link = link.startswith("http://") and link or "http://"+link
             site = urllib.urlopen(link)
             soup = BeautifulSoup(site)
             try:
