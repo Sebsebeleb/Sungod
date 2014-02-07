@@ -1378,6 +1378,8 @@ def handlePubMessage(connection, event):
         if link:
             stats["users"][speaker].links += 1
             link = link.group()
+            if not link.startswith("http://") and not link.startswith("https://"):
+                link = "https://" + link
             site = urllib.urlopen(link)
             soup = BeautifulSoup(site)
             try:
