@@ -1,8 +1,9 @@
-    # -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
 import sys
 import traceback
 import os
+
 sys.path.append(os.path.join("libs", "external"))
 
 import pickle as cPickle  # @UnusedImport HAHAHHAHAH LEARN TO USE IMPORTS PROPERLY
@@ -44,7 +45,7 @@ re_scale = re.compile(r"(|.+ )(((?P<low1>\d+)-(?P<high1>\d+))|((?P<low2>\d+) to\
 songre = re.compile(r"og:title\" content=\"(.*)\"")
 artre = re.compile(r"artist/[A-Za-z0-9]{22}\">(.*)</a>")
 
-re_math = re.compile(r"([0-9-+/\*^\(\)]|"+"|".join(dir(math))+")+")
+re_math = re.compile(r"([0-9-+/\*^\(\)]|" + "|".join(dir(math)) + ")+")
 re_because = re.compile(r"[B|b]ecause (.+)")
 
 random.seed()
@@ -54,7 +55,6 @@ pubcommands = {}
 server = None
 speaker = None
 
-
 config = ConfigParser.ConfigParser()
 config.read(r"conf.ini")  # read the config.ini
 previous_line = ""
@@ -63,12 +63,12 @@ pie_jokes = (
     ("What's the best thing to put into a pie?", 'Your teeth!'),
     ('Why did the pie go to a dentist?', 'Because he needed a filling!'),
     ("What's the difference between a worm and an apple?",
-        'Have you ever tried worm pie?'),
+     'Have you ever tried worm pie?'),
     ('What do you get if you cross a jogger with an apple pie?',
      'Puff pastry'),
     ('What did the cherry say to the cherry pie?', "You've got some crust."),
     ('Where does Dorothy from OZ weigh a pie?',
-        'Somewhere over the rainbow, weigh-a-pie!'),
+     'Somewhere over the rainbow, weigh-a-pie!'),
     ("What is a ghost's favourite dessert?", 'Boo-Berry pie with I-scream!'),
     ("What did the boss say to the bad employee?", "You're pie-red!"),
     ("What do you call a religious baker?", "pie-ous."),
@@ -94,8 +94,7 @@ pie_jokes = (
     ("What is the best way to communicate with a fish?", "Drop it a line!"),
     ("Two fish swim into a concrete wall.",
      "The one turns to the other and says 'Dam!'"),
-    )
-
+)
 
 connection_info = {
     "network": config.get("connection", "network"),
@@ -105,7 +104,7 @@ connection_info = {
     "name": config.get("connection", "name"),
     "prefix": config.get("connection", "prefix"),
     "nickservpass": config.get("connection", "nickservpass"),
-    }
+}
 
 stats = {
 
@@ -130,9 +129,9 @@ stats = {
             "feeds": [r"http://www.gamer.no/feed/rss/",
                       r"http://api.twitter.com/1/statuses/user_timeline.rss?screen_name=BadlybadGames",
                       r"http://bbg.terminator.net/forums/syndication.php?limit=15"
-                      ]},
+            ]},
     "git": {"tag": None},
-    }
+}
 
 smart_memory = {"why": []}
 
@@ -142,13 +141,11 @@ hooks = []
 
 
 class Error(Exception):
-
     """Base class for exception in this module"""
     pass  # the salt, please
 
 
 class ArgsError(Error):
-
     def __init__(self, expr, msg):
         self.expr = expr
         self.msg = msg
@@ -156,10 +153,12 @@ class ArgsError(Error):
 #erstatter urlopen med custom-versjon som bruker w0bbrowser-headers!
 class sneakyurl(urllib.FancyURLopener):
     version = "Mozilla/5.0 (Windows NT 6.2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.57 Safari/537.36 OPR/18.0.1284.49"
+
+
 urllib._urlopener = sneakyurl()
 
-class User(object):
 
+class User(object):
     def __init__(self, name):
         self.name = name
         self.power = 100
@@ -225,18 +224,18 @@ class Ninjafy(basecmd):
     trigger = "ninjafy"
 
     mapping = {"a": "ka", "b": "zu", "c": "mi",
-              "d": "te", "e": "ku", "f": "lu", "g": "ji",
-   "h": "ri", "i": "ki", "j": "zu", "k": "me", "l": "ta",
-   "m": "rin", "n": "to", "o": "mo", "p": "no", "q": "ke",
-   "r": "shi", "s": "ari", "t": "chi", "u": "do", "v": "ru", "w": "mei",
-   "x": "na", "y": "fu", "z": "zi", " ": " ", "?": "??"}
+               "d": "te", "e": "ku", "f": "lu", "g": "ji",
+               "h": "ri", "i": "ki", "j": "zu", "k": "me", "l": "ta",
+               "m": "rin", "n": "to", "o": "mo", "p": "no", "q": "ke",
+               "r": "shi", "s": "ari", "t": "chi", "u": "do", "v": "ru", "w": "mei",
+               "x": "na", "y": "fu", "z": "zi", " ": " ", "?": "??"}
 
     def do(self, args, connection, event):
         name = " ".join(args)
         name = [i.lower() in self.mapping.keys()
-               and i.lower() or "?" for i in name]
+                and i.lower() or "?" for i in name]
         say("".join([self.mapping[i]
-            for i in name]).capitalize(), event.target)
+                     for i in name]).capitalize(), event.target)
 
 
 class wobHere(basecmd):
@@ -254,11 +253,10 @@ class Week(basecmd):
     def do(self, args, connection, event):
         week = datetime.date.today().isocalendar()[1]
         connection.privmsg(event.target, "The current week is: " + str(
-            week) + ", aka "+["B", "A"][week % 2]+"-uke.")
+            week) + ", aka " + ["B", "A"][week % 2] + "-uke.")
 
 
 class Pynify(basecmd):
-
     """(url), returns a short url"""
     type = "pub"
     trigger = "tinyfy"
@@ -266,7 +264,7 @@ class Pynify(basecmd):
     def do(self, args, connection, event):
         try:
             result = PyNify.tinyfy("".join(args))
-            print "Here is result: "+str(result)
+            print "Here is result: " + str(result)
         except:
             result = "Sorry, error occoured."
         else:
@@ -275,7 +273,6 @@ class Pynify(basecmd):
 
 
 class Statsmanip(basecmd):
-
     """([user], stat, new), modifies the stats data"""
     type = "pub"
     trigger = "set"
@@ -322,7 +319,6 @@ class Statsmanip(basecmd):
 
 
 class Get(basecmd):
-
     """([user], stat), retrieves data"""
     powerreq = 3
     trigger = "get"
@@ -347,7 +343,6 @@ class Get(basecmd):
 
 
 class JoinChan(basecmd):
-
     """(#channel), Joins the specified channel"""
     trigger = "join"
     powerreq = 5
@@ -357,7 +352,6 @@ class JoinChan(basecmd):
 
 
 class PartChan(basecmd):
-
     """(channel, [message]) Leaves the channel specified"""
     trigger = "leave"
     powerreq = 5
@@ -370,7 +364,6 @@ class PartChan(basecmd):
 
 
 class Query(basecmd):
-
     """(channel|user, msg) Tells the specified channel/user message"""
     trigger = "tell"
     powerreq = 20
@@ -382,42 +375,41 @@ class Query(basecmd):
 
 
 class Quote(basecmd):
-
     """([quote]/list) Tells the story of [quote], or if no quote, a random quote """
     trigger = "quote"
     powerreq = 100
     quotes = {"bsmith noob":
-            ["[20:03] <Sungod> .bsmith lol noob",
-            "[20:03] <bsmith> Sungod, Looking good",
-            "[20:03] <Sungod> Not sure what you are trying to say!"
-             ],
-            "pierim": [
-                "Sebtop: then there is NO way YOU CANT buy Skyrim",
-                "Sebtop: its like liking food and never eating pie",
-                "w0bni: 200kr worth it?",
-                "Sebtop: ofcourse, like paying 10 kr for a pie made by world's best pie cook",
-                "w0bni: how do I pronounce it?",
-                "Sebtop: Pierim"
-            ],
-        "fishes": ["<Frets> Sungod, how can we cheer you up?",
-            "<Sungod> Sleep with the fishes"
-                       ],
-            "woman": ["<Danvari> Sungod, what is a woman?",
-            "<Sungod> Run away"
-                      ],
-            "danbad": ["[19:08] <Frets> Sungod, why is Dan so bad?",
-            "[19:08] <Sungod> Check with Sebsebeleb has great knowledge regarding that"
-                       ],
-            "Tapion neutralizes Nekromans": [
-                "[12:32] <Tapion> Sungod /convert nekromans",
-                "[12:32] <Sungod> Succesfully executed command]",
-                "<i>And thus, the eternal struggle was solved.</i>"
-            ],
-        "w0bni's special sauce": [
-            "<w0bni> oh wow",
-            "<w0bni> my special sauce all over the monitor",
-            ]
-        }
+                  ["[20:03] <Sungod> .bsmith lol noob",
+                   "[20:03] <bsmith> Sungod, Looking good",
+                   "[20:03] <Sungod> Not sure what you are trying to say!"
+                  ],
+              "pierim": [
+                  "Sebtop: then there is NO way YOU CANT buy Skyrim",
+                  "Sebtop: its like liking food and never eating pie",
+                  "w0bni: 200kr worth it?",
+                  "Sebtop: ofcourse, like paying 10 kr for a pie made by world's best pie cook",
+                  "w0bni: how do I pronounce it?",
+                  "Sebtop: Pierim"
+              ],
+              "fishes": ["<Frets> Sungod, how can we cheer you up?",
+                         "<Sungod> Sleep with the fishes"
+              ],
+              "woman": ["<Danvari> Sungod, what is a woman?",
+                        "<Sungod> Run away"
+              ],
+              "danbad": ["[19:08] <Frets> Sungod, why is Dan so bad?",
+                         "[19:08] <Sungod> Check with Sebsebeleb has great knowledge regarding that"
+              ],
+              "Tapion neutralizes Nekromans": [
+                  "[12:32] <Tapion> Sungod /convert nekromans",
+                  "[12:32] <Sungod> Succesfully executed command]",
+                  "<i>And thus, the eternal struggle was solved.</i>"
+              ],
+              "w0bni's special sauce": [
+                  "<w0bni> oh wow",
+                  "<w0bni> my special sauce all over the monitor",
+              ]
+    }
 
     def do(self, args, connection, event):
         args = " ".join(args).strip("'\"")
@@ -426,7 +418,7 @@ class Quote(basecmd):
         if args == "list":
             connection.privmsg(event.target, "Available quotes:")
             connection.privmsg(event.target, '"' + '", "'.join(
-                self.quotes.keys())+'"')
+                self.quotes.keys()) + '"')
 
         elif args in self.quotes.keys():
             quote = self.quotes[args]
@@ -506,9 +498,13 @@ class TopSpeakers(basecmd):
 
         connection.privmsg(event.target, (
             "Top speakers of " + event.target).center(45, "*"))
-        for rank, u in enumerate([i[1] for i in reversed(sorted(stats.users.items(), key=lambda t: t[1].lines_spoke))][:n]):
+        for rank, u in enumerate(
+                [i[1] for i in reversed(sorted(stats.users.items(), key=lambda t: t[1].lines_spoke))][:n]):
             connection.privmsg(event.target, ((("   %s. is %s with %s lines" % ((
-                rank+1, u.name, u.lines_spoke))).ljust(35, " ")).center(45, "*")))
+                                                                                    rank + 1, u.name,
+                                                                                    u.lines_spoke))).ljust(35,
+                                                                                                           " ")).center(
+                45, "*")))
 
 
 class TopWord(basecmd):
@@ -538,7 +534,6 @@ class DisplayHelp(basecmd):
 
 
 class DaysTG(basecmd):
-
     """() Displays the time untill TG"""
     trigger = "tg"
 
@@ -546,7 +541,7 @@ class DaysTG(basecmd):
 
     def do(self, args, connection, event):
         now = datetime.datetime.now()
-        difference = self.tgtime-now
+        difference = self.tgtime - now
         connection.privmsg(event.target, str(difference).partition(".")[0])
 
 
@@ -558,12 +553,12 @@ class DFmoral(basecmd):
             "http://df.magmawiki.com/index.php/Main_Page").read()
         rex = re.compile(
             r'<div style="float: right; margin-left: 1em"><div style=.+>(.+)</div></div>')
-#        l = True
-#        while l != "":
-#            l = "".join([site.readline(),site.readline(),site.readline(),site.readline()])
-#            m = re.findall(rex,l)
-#            print "EMMMM: ", m,"\n\n\n"
-#            if m:
+        #        l = True
+        #        while l != "":
+        #            l = "".join([site.readline(),site.readline(),site.readline(),site.readline()])
+        #            m = re.findall(rex,l)
+        #            print "EMMMM: ", m,"\n\n\n"
+        #            if m:
         match = rex.search(site)
         if match:
             connection.privmsg(event.target, match.groups()[0])
@@ -574,33 +569,33 @@ class DFmoral(basecmd):
 
 class Random(basecmd):
     _heroes = ['Emerald Warden', 'Nomad', 'Devourer', 'Valkyrie', 'Amun Ra',
-        'Flint Beastwood', 'Pandamonium', 'Midas', 'Torturer', 'Legionnaire',
-        'Myrmidon', 'Lord Salforis', 'Rampage', 'Swiftblade', 'Electrician',
-        'Predator', 'Scout', 'Witch Slayer', 'Armadon', 'Pyromancer',
-        'Dampeer', 'Magebane', 'Monarch', 'Pebbles', 'Fayde', 'Aluna', 'Plague Rider',
-        'Succubus', 'Flux', 'Zephyr', 'Accursed', 'Blood Hunter',
-        'Gemini', 'Magmus', 'Moraxus', 'Parasite', 'Wretched Hag',
-        'Thunderbringer', 'Monkey King', 'Tempest', 'Chronos',
-        'Night Hound', 'Slither', 'Deadwood', 'Pollywog Priest',
-        'Forsaken Archer', 'Demented Shaman', 'Kraken', 'Arachna',
-        'Glacius', 'Wildsoul', 'Moon Queen', 'Blacksmith', 'Nymphora',
-        'Engineer', 'Corrupted Disciple', 'Gauntlet', 'Bubbles', 'Voodoo Jester',
-        'Pharaoh', 'Vindicator', 'Jeraziah', 'Hellbringer', 'The Gladiator',
-        'Silhouette', 'Hammerstorm', 'Pestilence', 'Behemoth', 'Puppet Master',
-        'Keeper of the Forest', 'Master Of Arms', 'Cthulhuphant', 'Bombardier',
-        'Soulstealer', 'Maliken', 'Andromeda', 'The Madman', 'Martyr', 'Drunken Master',
-        'Tremble', 'The Chipper', 'Empath', 'Soul Reaper', 'Tundra', 'Defiler',
-        'Revenant', 'Rhapsody', 'Sand Wraith', 'Doctor Repulsor', 'Geomancer',
-        'War Beast', 'The Dark Lady', 'Balphagore', 'Ophelia', 'Shadowblade']
+               'Flint Beastwood', 'Pandamonium', 'Midas', 'Torturer', 'Legionnaire',
+               'Myrmidon', 'Lord Salforis', 'Rampage', 'Swiftblade', 'Electrician',
+               'Predator', 'Scout', 'Witch Slayer', 'Armadon', 'Pyromancer',
+               'Dampeer', 'Magebane', 'Monarch', 'Pebbles', 'Fayde', 'Aluna', 'Plague Rider',
+               'Succubus', 'Flux', 'Zephyr', 'Accursed', 'Blood Hunter',
+               'Gemini', 'Magmus', 'Moraxus', 'Parasite', 'Wretched Hag',
+               'Thunderbringer', 'Monkey King', 'Tempest', 'Chronos',
+               'Night Hound', 'Slither', 'Deadwood', 'Pollywog Priest',
+               'Forsaken Archer', 'Demented Shaman', 'Kraken', 'Arachna',
+               'Glacius', 'Wildsoul', 'Moon Queen', 'Blacksmith', 'Nymphora',
+               'Engineer', 'Corrupted Disciple', 'Gauntlet', 'Bubbles', 'Voodoo Jester',
+               'Pharaoh', 'Vindicator', 'Jeraziah', 'Hellbringer', 'The Gladiator',
+               'Silhouette', 'Hammerstorm', 'Pestilence', 'Behemoth', 'Puppet Master',
+               'Keeper of the Forest', 'Master Of Arms', 'Cthulhuphant', 'Bombardier',
+               'Soulstealer', 'Maliken', 'Andromeda', 'The Madman', 'Martyr', 'Drunken Master',
+               'Tremble', 'The Chipper', 'Empath', 'Soul Reaper', 'Tundra', 'Defiler',
+               'Revenant', 'Rhapsody', 'Sand Wraith', 'Doctor Repulsor', 'Geomancer',
+               'War Beast', 'The Dark Lady', 'Balphagore', 'Ophelia', 'Shadowblade']
     _hero = _heroes
     _support = ["Midas (semi)", "Myrmidon", "Witch Slayer", "Pyromancer",
-        "Monarch", "Plague Rider", "Succubus", "Accursed", "Magmus", "Thunderbringer (semi)",
-        "Tempest", "Slther", "Pollywog Priest", "Demented Shaman", "Glacius",
-        "Blacksmith", "Nymphora", "Engineer", "Bubbles (semi)", "Voodoo Jester",
-        "Pharaoh (situ)", "Vindicator", "Jereziah", "Hellbringer", "Hammerstorm (semi)",
-        "Behemoth (semi)", "Bombardier (semi)", "Andromeda", "Martyr (semi)",
-        "Empath", "Soul Reaper (situ)", "Revenant", "Rhapsody", "Geomancer",
-        "Ophelia"]
+                "Monarch", "Plague Rider", "Succubus", "Accursed", "Magmus", "Thunderbringer (semi)",
+                "Tempest", "Slther", "Pollywog Priest", "Demented Shaman", "Glacius",
+                "Blacksmith", "Nymphora", "Engineer", "Bubbles (semi)", "Voodoo Jester",
+                "Pharaoh (situ)", "Vindicator", "Jereziah", "Hellbringer", "Hammerstorm (semi)",
+                "Behemoth (semi)", "Bombardier (semi)", "Andromeda", "Martyr (semi)",
+                "Empath", "Soul Reaper (situ)", "Revenant", "Rhapsody", "Geomancer",
+                "Ophelia"]
     _w0bstyle = [
         "Enigma", "Rikimaru", "Roshan", "Slather", "Chokochick", "Batni",
         "Shrut", "Codex 5", "SotM NH", "Slothni", "Codex Queen", "Fundromeda", "Pesto",
@@ -611,7 +606,7 @@ class Random(basecmd):
         "Parasite (semi)", "Legionaire (cskip)", "Zeph (cskip)"]
     _push = _pusher
     _nuker = ["Pyromancer", "Torturer",
-        "Thunderbringer", "Behemoth", "Wretched hag"]
+              "Thunderbringer", "Behemoth", "Wretched hag"]
     _ganker = [
         "Pyromancer", "Torturer", "Thunderbringer", "Behemoth", "Wretched hag",
         "Tempest", "Deadwood", "Devourer", "Valkyrie", "Pandamonium", "Electrician", "Gauntlet",
@@ -633,12 +628,12 @@ class Random(basecmd):
     num = number
     roll = lambda self, x, y: random.randint(int(x), int(y))
     validargs = ["heroes", "nuker", "w0bstyle",
-        "push/pusher", "heal(er)", "hard_carry", "kongor"]
+                 "push/pusher", "heal(er)", "hard_carry", "kongor"]
     _user = property(lambda self: [i for i in getattr(stats, "users").keys()])
     bool = property(lambda self: random.random() > 0.5 and "Yes" or "No")
 
     def _randhero(self, l):
-        return random.choice(getattr(self, "_"+l))
+        return random.choice(getattr(self, "_" + l))
 
     def do(self, args, connection, event):
         times = 1
@@ -662,8 +657,8 @@ class Random(basecmd):
                 return
             elif len(args) == 1:
                 try:
-                    if times > len(getattr(self, "_"+args[0])):
-                        times = len(getattr(self, "_"+args[0]))
+                    if times > len(getattr(self, "_" + args[0])):
+                        times = len(getattr(self, "_" + args[0]))
                     result = []
                     h = self._randhero(args[0])
                     for i in range(times):
@@ -691,7 +686,6 @@ class Random(basecmd):
 
 
 class Timer(basecmd):
-
     """([who], time, [message]), after the specified time has passed, will deliver the message to the specified person, or you"""
     trigger = "timer"
 
@@ -716,15 +710,15 @@ class Timer(basecmd):
             i = int(i.group())
             f = 1
             if any([a.endswith(n) for n in ["d", "day", "days"]]):
-                f = 60*60*24
+                f = 60 * 60 * 24
             elif any([a.endswith(n) for n in ["h", "hour", "hours"]]):
-                f = 60*60
+                f = 60 * 60
             elif any([a.endswith(n) for n in ["m", "minute", "minutes", "min"]]):
                 f = 60
             elif any([a.endswith(n) for n in ["mo", "month", "months"]]):
-                f = 60*60*24*32
+                f = 60 * 60 * 24 * 32
             elif any([a.endswith(n) for n in ["y", "year", "years"]]):
-                f = 60*60*24*32*12
+                f = 60 * 60 * 24 * 32 * 12
             delay += i * f
 
         trigger_date = datetime.datetime.now() + datetime.timedelta(0, delay)
@@ -764,7 +758,7 @@ class Restart(basecmd):
         proc = sys.executable
         server.disconnect()
         call(["git", "pull", "origin"])
-        os.execl(proc, proc, * sys.argv)
+        os.execl(proc, proc, *sys.argv)
 
 
 class RPS(basecmd):
@@ -830,7 +824,7 @@ class RPS(basecmd):
         if speaker in self.players_wait and msg in ["1", "2", "3"]:
             self.players_wait.remove(speaker)
             self.answers[speaker] = ["Rock", "Paper", "Scissors"][
-                self.answers[speaker].index(int(msg)-1)]
+                self.answers[speaker].index(int(msg) - 1)]
             print self.players_wait
             if len(self.players_wait) == 0:
                 print "It is!"
@@ -884,7 +878,7 @@ class Exec(basecmd):
         command = " ".join(args)
         print command
         try:
-            exec(command)
+            exec (command)
         except Exception as e:
             connection.privmsg(event.target, "You are talking unclear.")
             print e
@@ -917,12 +911,12 @@ class Die(basecmd):
 
 
 class Spell(basecmd):
-
     trigger = "spell"
     commands = ["set", "get"]
 
     def do(self, args, connection, event):
         import enchant
+
         d = enchant.Dict(stats["spell_dict"])
         if args[0] in self.commands:
             pass
@@ -951,7 +945,6 @@ class Spell(basecmd):
 
 
 class Charges(basecmd):
-
     """
     One charge regenerations every test, max of 2.
     """
@@ -986,10 +979,10 @@ class Charges(basecmd):
                         connection.privmsg(
                             event.target, "w0bni already had max amount of charges")
             except AttributeError as e:
-                    print e
-                    connection.privmsg(
-                        event.target, "w0bni did not have charges leveled up, leveling it up for him...")
-                    w.charges = 1
+                print e
+                connection.privmsg(
+                    event.target, "w0bni did not have charges leveled up, leveling it up for him...")
+                w.charges = 1
         if args[0] in ["get", "check", "remaining"]:
             connection.privmsg(event.target, "w0bni has " + str(
                 w.charges) + " left at the moment.")
@@ -1000,11 +993,13 @@ class Dictionary(basecmd):
 
     def do(self, args, connection, event):
         import libs.dictionary as dictionary
+
         dictionary.load_index()
         d = dictionary.look_up(" ".join(args))
         print "d: ", d
         if not d:
             import enchant
+
             d = enchant.Dict(stats["spell_dict"])
             s = "'" + " ".join(args) + "' was not found, maybe you meant; " + ", ".join(
                 d.suggest(" ".join(args))) + "?"
@@ -1015,7 +1010,6 @@ class Dictionary(basecmd):
 
 
 class wob(basecmd):
-
     trigger = "wob"
 
     def do(self, args, connection, event):
@@ -1025,7 +1019,7 @@ class wob(basecmd):
         wobStatus = str(BeautifulSoup(getWobStatus)).split("|")
 
         response = ("I am so sorry, " if wobStatus[
-                    0] == "0" else "Indeed, ") + wobStatus[1]
+                                             0] == "0" else "Indeed, ") + wobStatus[1]
         connection.privmsg(event.target, response)
 
 
@@ -1042,7 +1036,7 @@ class Top(basecmd):
         elif "reversed" in args or "-r" in args:
             if len(args) == 3:
                 n = int(args[1] != "reversed" or args[
-                        1] == "-r" and args[1] or args[2])
+                                                     1] == "-r" and args[1] or args[2])
             reverse = False
         else:
             try:
@@ -1051,7 +1045,7 @@ class Top(basecmd):
                 return
         if not hasattr(stats["users"].values()[0], stat):
             connection.privmsg(
-                event.target, "Sorry, '" + stat+"' is not known to me")
+                event.target, "Sorry, '" + stat + "' is not known to me")
             return
         l = [(i.name, getattr(i, stat)) for i in stats["users"].values()]
 
@@ -1063,14 +1057,14 @@ class Top(basecmd):
 
         title = "Top " + stat + " of " + event.target + ":"
         connection.privmsg(event.target, title.center(
-            len(title)+12, " ").center(55, "*"))
+            len(title) + 12, " ").center(55, "*"))
         if reverse:
             l = [(r, i[0], i[1]) for r, i in enumerate(l, 1)]
         else:
-            l = [(len(stats["users"].values()) - r+1, i[0], i[1])
-                for r, i in enumerate(l, len(stats["users"]))]
+            l = [(len(stats["users"].values()) - r + 1, i[0], i[1])
+                 for r, i in enumerate(l, len(stats["users"]))]
         for rank, user, value in l:
-            connection.privmsg(event.target, (((("*"*5+" "*5+("%s. is %s with %s %s" % (
+            connection.privmsg(event.target, (((("*" * 5 + " " * 5 + ("%s. is %s with %s %s" % (
                 rank, user, value, stat)))).ljust(50, " ")).ljust(55, "*")))
 
 
@@ -1094,11 +1088,11 @@ class RSS(basecmd):
 
     def delete(self, link):
         stats["rss"]["feeds"].remove(link)
+
     cmds = {"add": add, "delete": delete}
 
 
 class UConvert(basecmd):
-
     """
     create_system name unitscale scaletype
     add_unit system long_name shortname scale_value
@@ -1113,7 +1107,7 @@ class UConvert(basecmd):
             connection.privmsg(event.target, "Error: " + str(e))
         if result:
             s = "%s %s is %s %s" % (args[1], result[
-                                    1].long_name, result[0], result[2].long_name)
+                1].long_name, result[0], result[2].long_name)
         else:
             s = "Succesfully executed command"
         connection.privmsg(event.target, s)
@@ -1128,7 +1122,7 @@ class Time(basecmd):
         if index == 4:
             index = 0
         answer = ["It is HON O' CLOCK!", "It is quarter past HON TIME!",
-            "It is half past HON TIME!", "It is quarter to HON TIME!"][index]
+                  "It is half past HON TIME!", "It is quarter to HON TIME!"][index]
         answer += " (http://bbg.terminator.net/timeserver)"
         connection.privmsg(event.target, answer)
 
@@ -1144,6 +1138,7 @@ class Wikipedia(basecmd):
         s = s[:200]
         say(s, event.target)
 
+
 class TextPreview(basecmd):
     trigger = "preview"
 
@@ -1157,14 +1152,13 @@ class TextPreview(basecmd):
 
 
 builtincmds = [Statsmanip, JoinChan, PartChan, Query, Quote, DisplayHelp,
-              RandomQuote, TopSpeakers, DaysTG, Random, RPS, Exec, Get,
-              Timer, Die, Spell, Charges, Dictionary, Top, DFmoral, RSS,
-              UConvert, Pynify, Python, Ninjafy, gw2check, GetError, Restart, Time,
-              wob, Week, Wikipedia, wobHere, TextPreview]
+               RandomQuote, TopSpeakers, DaysTG, Random, RPS, Exec, Get,
+               Timer, Die, Spell, Charges, Dictionary, Top, DFmoral, RSS,
+               UConvert, Pynify, Python, Ninjafy, gw2check, GetError, Restart, Time,
+               wob, Week, Wikipedia, wobHere, TextPreview]
 
 
 class Hooks():
-
     temp_hooks = {}
     perma_hooks = []
 
@@ -1250,7 +1244,7 @@ def handleJoin(connection, event):
         print "HAS THE USER CHECKED NOTES?: ", stats["users"][joiner].checked_notes
         if not stats["users"][joiner].checked_notes:
             print "joiner has not checked notes!"
-            say("You have new notes, "+joiner+"! "+r"http://bbg.terminator.net/desknotes/notes/%s.txt" %
+            say("You have new notes, " + joiner + "! " + r"http://bbg.terminator.net/desknotes/notes/%s.txt" %
                 joiner, event.target)
             # stats["users"][joiner].checked_notes = True
     print "|----ON JOIN GOODBYE-----|"
@@ -1260,7 +1254,7 @@ def handlePrivMessage(connection, event):
     speaker = event.source.split("!")[0]
     msg = event.arguments[0]
     tim = time.strftime("[%H:%M:%S]")
-    print tim + '"'+speaker+'": ' + msg
+    print tim + '"' + speaker + '": ' + msg
 
 
 """def handlePrivMessage(connection, event):
@@ -1347,17 +1341,17 @@ def handlePubMessage(connection, event):
     time_stamp = time.strftime("[%H:%M:%S]")
 
     if "http://localhost" in message and "bni" in speaker:
-        connection.privmsg(event.target, "He meant "+message.replace(
+        connection.privmsg(event.target, "He meant " + message.replace(
             "localhost", "84.215.30.88"))
 
     if "/bbgdump" in message:
         m = message.split("/bbgdump")[1].strip(" ")
         connection.privmsg(
-            event.target, "http://bbg.terminator.net/media/dumps/"+m)
+            event.target, "http://bbg.terminator.net/media/dumps/" + m)
 
     l = message.split()
     message = " ".join([re.match(
-        r"%(\w|_| )+%", i) and Substitution.convert(i)or i for i in l])
+        r"%(\w|_| )+%", i) and Substitution.convert(i) or i for i in l])
 
     global log
     log.append((time_stamp, speaker, message))
@@ -1394,22 +1388,22 @@ def handlePubMessage(connection, event):
                 print "ERROR OCCOURED: ", e
                 title = None
             if stats["peek_mode"] and title:
-                connection.privmsg(event.target, "'"+title[
-                                   :stats["PEEKMAXTITLE"]]+"'")
+                connection.privmsg(event.target, "'" + title[
+                                                        :stats["PEEKMAXTITLE"]] + "'")
     except:
         pass
 
     spot = spotre.search(message)
     if spot:
         spot = spot.groups()
-        url = "http://ws.spotify.com/lookup/1/.json?uri=spotify:track:"+spot[0]
+        url = "http://ws.spotify.com/lookup/1/.json?uri=spotify:track:" + spot[0]
         track_data = json.load(urllib.urlopen(url))
         artists = [a.get("name") for a in track_data.get("track").get("artists")]
         song = track_data.get("track").get("name")
 
         tags = song.split(" ")
         ulink = 'https://gdata.youtube.com/feeds/api/videos?orderby=viewCount&q=' + \
-            "+".join(tags)
+                "+".join(tags)
         getTube = urllib.urlopen(ulink).read()
         countRes = getTube.split("totalResults>")[1].split("</")[0]
         if countRes == "0":
@@ -1417,10 +1411,10 @@ def handlePubMessage(connection, event):
         # elif artist in getTube: helt serr, få inn denne - det blir
         # kung. Statistikk basert på 2 testsøk viser det!
         else:
-            tubeOut = " (http://youtu.be/"+getTube.split(
-                "watch?v=")[1].split("&amp")[0]+")"
+            tubeOut = " (http://youtu.be/" + getTube.split(
+                "watch?v=")[1].split("&amp")[0] + ")"
             connection.privmsg(event.target, "" + str(
-                song)+" by "+", ".join(artists) + tubeOut)
+                song) + " by " + ", ".join(artists) + tubeOut)
 
     print event.target + '> ' + speaker + ': ' + event.arguments[0]
 
@@ -1484,19 +1478,19 @@ def handlePubMessage(connection, event):
     m = re.search(r"r/\w+", message, re.IGNORECASE)
     if m:
         connection.privmsg(
-            event.target, "http://www.reddit.com/"+m.group().strip(" "))
+            event.target, "http://www.reddit.com/" + m.group().strip(" "))
     m = re.match(r"^s/(\w+)/(\w+)", message, re.IGNORECASE)
     if m:
         pat, rep = m.groups()
         message = stats["users"][speaker].previous_line
         s = re.sub(pat, rep, message)
-        connection.privmsg(event.target, "He meant '"+s+"'")
+        connection.privmsg(event.target, "He meant '" + s + "'")
     m = re.match(r"^a/(\w+)/(\w+)", message, re.IGNORECASE)
     if m:
         pat, rep = m.groups()
         message = previous_line
         s = re.sub(pat, rep, message)
-        connection.privmsg(event.target, "He meant '"+s+"'")
+        connection.privmsg(event.target, "He meant '" + s + "'")
 
     # Commands and Sungod say
     if event.arguments[0].lower().startswith(connection_info["prefix"].lower()):
@@ -1504,12 +1498,12 @@ def handlePubMessage(connection, event):
             stats["users"]["w0bni"].faith -= 1
             stats["users"]["w0bni"].sin += 1
         stats["users"][speaker].faith += 1
-        msg = event.arguments[0][len(connection_info["prefix"])+1:].split()
+        msg = event.arguments[0][len(connection_info["prefix"]) + 1:].split()
         if len(msg) == 0:
             a = random.choice(
                 ["What is the matter ", "Yes, ", "You seek my wisdom, ",
-                             "Are the fishes troubling you, ", "Is the light unclear for your eyes, ",
-                             "Is something the matter with your fishjumping, "])
+                 "Are the fishes troubling you, ", "Is the light unclear for your eyes, ",
+                 "Is something the matter with your fishjumping, "])
             connection.privmsg(event.target, a + speaker + "?")
             Hooks.register_hook(you_asked_memory, 10, speaker)
             return
@@ -1526,7 +1520,8 @@ def handlePubMessage(connection, event):
                 say("I do not understand what you want me to do", event.target)
                 return
 
-            if int(stats["users"][speaker].power) <= int(pubcommands[cmd].powerreq) or speaker.lower() == "sebsebeleb" or speaker.lower() == "w0bni":
+            if int(stats["users"][speaker].power) <= int(
+                    pubcommands[cmd].powerreq) or speaker.lower() == "sebsebeleb" or speaker.lower() == "w0bni":
                 if len(args) > 0 and args[0] in ["help", "-h", "--help"]:
                     connection.privmsg(event.target, pubcommands[cmd].__doc__)
                 else:
@@ -1536,26 +1531,29 @@ def handlePubMessage(connection, event):
                         connection.privmsg(
                             event.target, pubcommands[cmd].__doc__)
             else:
-                print "User tried to perform " + cmd + ", but his/her power isnt high enough (" + str(stats["users"][speaker].power) + " vs " + str(pubcommands[cmd].powerreq) + ")"
+                print "User tried to perform " + cmd + ", but his/her power isnt high enough (" + str(
+                    stats["users"][speaker].power) + " vs " + str(pubcommands[cmd].powerreq) + ")"
                 connection.privmsg(event.target, "Sorry, not enough power. (" + str(stats[
-                                   "users"][speaker].power) + " vs " + str(pubcommands[cmd].powerreq) + ")")
+                    "users"][speaker].power) + " vs " + str(pubcommands[cmd].powerreq) + ")")
 
         elif any(" ".join(msg).startswith(d) for d in ['hello', 'hi', 'howdy',
-                                               "morning", "hey", "hola",
-                                               "greetings", "top of the morning"]):
+                                                       "morning", "hey", "hola",
+                                                       "greetings", "top of the morning"]):
             connection.privmsg(event.target, "Hello to you " + speaker + "!")
 
         elif any(" ".join(msg).startswith(d) for d in ["thank you", "thanks", "ty", "arigato"]):
             connection.privmsg(event.target, "You are welcome smallsun")
 
-        elif " ".join(msg).lower() in ["i hate you sungod!", "I hate sungod", "i love nekro", "i love nekromans", "xd", "nekro<3"]:
+        elif " ".join(msg).lower() in ["i hate you sungod!", "I hate sungod", "i love nekro", "i love nekromans", "xd",
+                                       "nekro<3"]:
             stats["users"]["Frets"].sin += 1
 
         else:
             if stats["smart_mode"]:
                 random.seed("".join(message.split(" ")[1:]))
             sungod_says(message, connection, event, speaker)
-    elif connection_info["prefix"] in message.split(" ")[-1] and len(message.split(" ")[-1]) == len(connection_info["prefix"]):
+    elif connection_info["prefix"] in message.split(" ")[-1] and len(message.split(" ")[-1]) == len(
+            connection_info["prefix"]):
         # TO-BE-DONE-LATER: ^ Needs a better implementation. "What is
         # happening, Sungod?" would send it as "What is happening," rather than
         # the inteded "What is happening?"
@@ -1578,9 +1576,11 @@ def sungod_says(msg, connection, event, speaker):
 
     if raw_str[0] == connection_info["prefix"]:
         raw_str = raw_str[1:]
-    elif raw_str[0].startswith(connection_info["prefix"]) and raw_str[0][len(connection_info["prefix"])] in [".", ",", "?", "!"]:
+    elif raw_str[0].startswith(connection_info["prefix"]) and raw_str[0][len(connection_info["prefix"])] in [".", ",",
+                                                                                                             "?", "!"]:
         raw_str = raw_str[1:]
-    if len(raw_str) == 0 or all([i == "" for i in raw_str]):  # TODO: Maybe find a better non hacky way for the message " "
+    if len(raw_str) == 0 or all(
+            [i == "" for i in raw_str]):  # TODO: Maybe find a better non hacky way for the message " "
         return
     raw_str = " ".join(raw_str)
     raw_str = raw_str.strip()
@@ -1615,8 +1615,8 @@ def sungod_says(msg, connection, event, speaker):
         print low < high
         if low < high:
             low, high = int(low), int(high)
-            i = random.randrange(low, high+1)
-            answer = "Hmm... About "+str(i)+"."
+            i = random.randrange(low, high + 1)
+            answer = "Hmm... About " + str(i) + "."
         else:
             answer = "I am uncertain"
 
@@ -1633,14 +1633,14 @@ def sungod_says(msg, connection, event, speaker):
         bro = speaker
         stats["users"][to].checked_note = False
         print "#-----| THE USER HAS NO LONGER CHECKED NOTES"
-        sendNote = urllib.urlopen("http://bbg.terminator.net/desknotes/newnote.php?to="+str(
-            to)+"&from="+str(bro)+"&msg="+str(msg))
+        sendNote = urllib.urlopen("http://bbg.terminator.net/desknotes/newnote.php?to=" + str(
+            to) + "&from=" + str(bro) + "&msg=" + str(msg))
         resp = BeautifulSoup(sendNote)
         if "Error" in str(resp):
-            answer = "Sorry, "+str(
-                speaker)+", I could not note that. The bokk might be broken."
+            answer = "Sorry, " + str(
+                speaker) + ", I could not note that. The bokk might be broken."
         elif "Success" in str(resp):
-            answer = "I will make sure "+str(to)+" gets the message!"
+            answer = "I will make sure " + str(to) + " gets the message!"
         else:
             answer = "Nothing went wrong, yet something went wrong. The bokk is a mysterious item."
 
@@ -1670,7 +1670,7 @@ def sungod_says(msg, connection, event, speaker):
 
         choices = [w for w in raw_str.split() if not w == "or"]
         if not len(choices) == 2:
-            choices = choices[len(choices)-i-1:]
+            choices = choices[len(choices) - i - 1:]
         for e, i in enumerate(choices):
             choices[e] = i.rstrip(",")
 
@@ -1687,8 +1687,10 @@ def sungod_says(msg, connection, event, speaker):
             if person:
                 person = person.groups()[0]
                 answers = [
-                    " is a man of great reknown. The great warm book tells only good of him.", " is a blasphemous nekro", "... How I hate him... Please, don't speak of him",
-                    " has done many a great deed! He is among the most fabolous and cute of my worshippers", " is an unknown name to me. Who is this?", " might not be the one you think he his, be careful.",
+                    " is a man of great reknown. The great warm book tells only good of him.",
+                    " is a blasphemous nekro", "... How I hate him... Please, don't speak of him",
+                    " has done many a great deed! He is among the most fabolous and cute of my worshippers",
+                    " is an unknown name to me. Who is this?", " might not be the one you think he his, be careful.",
                     " is very infamous for his wicked brackets and semicolons, do not speak with him!"]
                 answer = person + random.choice(answers)
             else:  # TODO: If no person is asked about!
@@ -1698,7 +1700,7 @@ def sungod_says(msg, connection, event, speaker):
             method = random.randint(1, 1)
             if method == 1:
                 u = random.choice([u.capitalize() for u in
-                                 stats["users"].keys()] + ["me"])
+                                   stats["users"].keys()] + ["me"])
                 if u == speaker.capitalize():
                     u = "you"
                 answer = "That would be " + u
@@ -1723,7 +1725,7 @@ def sungod_says(msg, connection, event, speaker):
             answer = prefix + " " + u + " " + suffix
         elif method == 4:
             prefix = random.choice(["I hear", "I believe", "Check with",
-                                   "It could be that", "According to the warm bokk,", "The fish say"])
+                                    "It could be that", "According to the warm bokk,", "The fish say"])
             suffix = random.choice(
                 ["has great knowledge regarding that", "is more than able to answer you that",
                  "is in possesion of the answer for that", "should have the answer"])
@@ -1740,19 +1742,21 @@ def sungod_says(msg, connection, event, speaker):
                 if i not in u and i != speaker.lower():
                     u.append(i)
             answer = "You must walk to the " + \
-                random.choice(
-                    ["shapell", "shursh", "far away tribe", "bat cave", "place where the sun never sets",
-                "fishes", "room of the great warm bokk", "place where the fishes live"]) +\
-                ", " +\
-                random.choice(
-                    ["there you will find", "there you must search for", "and kill", ", and you must battle to death with",
-                ", and you must dance with"]) +\
-                " " + u[0] + " " +\
-                random.choice(
-                    ["under the tree", "inside the room with my symbol", "inside a box", "next to the great warm bokk",
-                "in the water", "inside the secret room"]) +\
-                ". He will guide you to " + u[
-                    1] + " and he will have your answer."
+                     random.choice(
+                         ["shapell", "shursh", "far away tribe", "bat cave", "place where the sun never sets",
+                          "fishes", "room of the great warm bokk", "place where the fishes live"]) + \
+                     ", " + \
+                     random.choice(
+                         ["there you will find", "there you must search for", "and kill",
+                          ", and you must battle to death with",
+                          ", and you must dance with"]) + \
+                     " " + u[0] + " " + \
+                     random.choice(
+                         ["under the tree", "inside the room with my symbol", "inside a box",
+                          "next to the great warm bokk",
+                          "in the water", "inside the secret room"]) + \
+                     ". He will guide you to " + u[
+                         1] + " and he will have your answer."
         elif method in [6, 7, 8]:
             reason = random.choice(smart_memory["why"])
             answer = "That would be because " + reason
@@ -1788,17 +1792,17 @@ def sungod_says(msg, connection, event, speaker):
                     while u == speaker.capitalize() and u != who.capitalize():
                         u = random.choice(stats["users"].keys())
                     answer = "I believe " + u + " is softing with " + \
-                        who + ", those scandalous dimmers"
+                             who + ", those scandalous dimmers"
             else:
                 answer = "God knows."
         else:
             answer = random.choice(
                 ["In the shapell", "With the bats", "Where the bats never leave",
-                "Somewhere over the rainbow", "Not here atleast."])
+                 "Somewhere over the rainbow", "Not here atleast."])
 
     elif "when" == raw_str.lower().split(" ")[0]:
         answers = ["I would say about...",
-            "Roughly", "As prophesied by the bokk,"]
+                   "Roughly", "As prophesied by the bokk,"]
         methods = 4
         method = random.randint(1, methods)
         if method == 1 or method == 2:
@@ -1807,12 +1811,13 @@ def sungod_says(msg, connection, event, speaker):
                 2, 59)) + random.choice([" minutes", " seconds"])
         elif method == 3:
             answer = "You must wait " + random.choice(["one", "two", "three",
-                                                        "eight"]) + " " + random.choice(["days", "hours", "sunsets", "years"])
+                                                        "eight"]) + " " + random.choice(
+                ["days", "hours", "sunsets", "years"])
         elif method == 4:
             t = random.choice(
                 ["The next time the sun sets", "When the bats cry", "When w0bni no longer leaks",
-                             "When the fishes cry", "When the fish are thirsty", "When I am ready", "When the Baptists gather",
-                             "When devell is dead", "When bats soft with fish", "When Baptist murders"])
+                 "When the fishes cry", "When the fish are thirsty", "When I am ready", "When the Baptists gather",
+                 "When devell is dead", "When bats soft with fish", "When Baptist murders"])
             answer = "" + t
 
     elif "what" == raw_str.lower().split(" ")[0]:
@@ -1825,9 +1830,9 @@ def sungod_says(msg, connection, event, speaker):
             else:
                 answers = [
                     "Pray", "Brace yourself", "Look for the bat cave and hide in it",
-                            "Run away", "Hide", "Speak with baptist", "Give a gift to Baptist",
-                            "Sleep with the fishes", "Fight nekromans", "Find the meaning of fish",
-                            "Fish", "Make like a fish, and bait"]
+                    "Run away", "Hide", "Speak with baptist", "Give a gift to Baptist",
+                    "Sleep with the fishes", "Fight nekromans", "Find the meaning of fish",
+                    "Fish", "Make like a fish, and bait"]
             answer = random.choice(answers)
         elif "will" in raw_str.lower():
             m = 1
@@ -1836,7 +1841,7 @@ def sungod_says(msg, connection, event, speaker):
                 answer = random.choice(
                     ["Many things can happen, if you pray you will be fine.",
                      "You will die.", "The fish will eat you.", "Nekromans will find you",
-                                      "Shursh will be destroyed", ])
+                     "Shursh will be destroyed", ])
         elif raw_str.lower().split()[1] == "is":
             rest = " ".join(raw_str.lower().split()[2:])
             rest = rest.strip("?")
@@ -1845,7 +1850,8 @@ def sungod_says(msg, connection, event, speaker):
                                     "tons of ponies!",
                                     "harmless",
                                     "very dangerous, you should avoid it!",
-                                    "unreachable", "something the great warm bokk tells a lot about. Read it and I am sure you will have your answer!",
+                                    "unreachable",
+                                    "something the great warm bokk tells a lot about. Read it and I am sure you will have your answer!",
                                     "untouchable like the fishes",
                                     "like sleeping with the fishes",
                                     "helping nekromans!",
@@ -1864,7 +1870,7 @@ def sungod_says(msg, connection, event, speaker):
                                     "crucial for your mission",
                                     "bat",
                                     "uncontrollable",
-                                    ])
+            ])
             answer = rest + " is " + suffix
         else:
             answer = "SAVE YOURSELF FOR MARRIAGE!"
@@ -1889,8 +1895,8 @@ def sungod_says(msg, connection, event, speaker):
         elif method == 2:
             answer = rest + "ing is an easy task for me! Ofcourse!"
 
-#    elif "how" == raw_str.lower().split(" ")[1]:
-#       answers =
+        #    elif "how" == raw_str.lower().split(" ")[1]:
+        #       answers =
     elif raw_str.endswith("?"):
 
         method = random.randint(1, 9)
@@ -1920,9 +1926,9 @@ def sungod_says(msg, connection, event, speaker):
             answer = "" + midfix.capitalize() + subfix
         elif method == 6 or method == 7:
             answer = "As said in the great warm bokk: " + \
-                '"' + midfix + '"' + subfix
-#        elif method == 8:
-#            answer = "Did you know I am very far away from you?"
+                     '"' + midfix + '"' + subfix
+        #        elif method == 8:
+        #            answer = "Did you know I am very far away from you?"
         elif method == 8 or method == 5:
             answer = "Is '" + midfix + "' the answer you seek, " + random.choice(
                 ["by chance?", "perhaps?", "or is my wisdom unfilling?"])
@@ -1951,16 +1957,16 @@ def court(speaker, message, chn):
         evil_cap = 0.04
 
         total_faith = sum([math.sqrt(f)
-                          for f in [u.faith for u in stats["users"].values()]])
+                           for f in [u.faith for u in stats["users"].values()]])
         speaker_faith = math.sqrt(stats["users"].get(speaker).faith)
         if math.sqrt(speaker_faith) > total_faith * faithful_cap:
             say("Oh no! How could someone as pure as " +
-                speaker+" have commited such mischief?", chn)
+                speaker + " have commited such mischief?", chn)
         elif total_faith * faithful_cap > math.sqrt(speaker_faith) > total_faith * evil_cap:
             s = "I see. So this one is an impure one. I wonder why he has become like this."
             if random.randint(1, 2) == 1:
                 influencer = random.choice([u.name for u in stats[
-                                           "users"].values() if math.sqrt(u.faith) < total_faith * evil_cap])
+                    "users"].values() if math.sqrt(u.faith) < total_faith * evil_cap])
                 if influencer:
                     s = s + " Maybe it was the act of the foul " + \
                         influencer + "."
@@ -2019,22 +2025,23 @@ def load_hooks():
     import pkgutil
     import os
     import hooks
+
     for i in [name for _, name, _ in pkgutil.iter_modules(['hooks'])]:
-        mod = __import__("hooks."+i, fromlist="hooks")
+        mod = __import__("hooks." + i, fromlist="hooks")
         for h in mod.hooks:
             Hooks.register_perma_hook(h)
-    #===========================================================================
-    # print dir(hooks)
-    # hook_path = os.path.join(os.getcwd(),"hooks")
-    # print hook_path
-    # for i in [i for i in os.listdir(hook_path) if i.endswith(".py")]:
-    #    module = __import__(os.path.join(hook_path,i))             HAHAHA MEGA COMMENT BLOCK
-    #    if not "hooks" in dir(module):
-    #        print "EXTENSION ERROR: The hook extension does not contain a hook dir"
-    #    else:
-    #        for h in module.hooks:
-    #            Hooks.register_perma_hook(h)
-    #=========================================================================
+            #===========================================================================
+            # print dir(hooks)
+            # hook_path = os.path.join(os.getcwd(),"hooks")
+            # print hook_path
+            # for i in [i for i in os.listdir(hook_path) if i.endswith(".py")]:
+            #    module = __import__(os.path.join(hook_path,i))             HAHAHA MEGA COMMENT BLOCK
+            #    if not "hooks" in dir(module):
+            #        print "EXTENSION ERROR: The hook extension does not contain a hook dir"
+            #    else:
+            #        for h in module.hooks:
+            #            Hooks.register_perma_hook(h)
+            #=========================================================================
 
 
 def save_settings(config="stats.db"):
@@ -2081,7 +2088,7 @@ def auto_save():
     delay = stats["autosave_interval"]
     if stats["arena_enabled"]:
         arena.save_heroes()
-    # reddit.start()
+        # reddit.start()
 
     irc.execute_delayed(delay, auto_save)
 
@@ -2090,12 +2097,16 @@ def rss_check():
     for i in stats["rss"]["feeds"]:
         f = feedparser.parse(i)
         for e in f["entries"]:
-            print time.strftime("%Y %m %d %H:%M:%S", e.updated_parsed) + " < " + time.strftime("%Y %m %d %H:%M:%S", stats["rss"]["last"]) + "?"
+            print time.strftime("%Y %m %d %H:%M:%S", e.updated_parsed) + " < " + time.strftime("%Y %m %d %H:%M:%S",
+                                                                                               stats["rss"][
+                                                                                                   "last"]) + "?"
             if e.updated_parsed < stats["rss"]["last"]:
-                print "BREAKING" + time.strftime("%Y %m %d %H:%M:%S", e.updated_parsed) + " < " + time.strftime("%Y %m %d %H:%M:%S", stats["rss"]["last"])
+                print "BREAKING" + time.strftime("%Y %m %d %H:%M:%S", e.updated_parsed) + " < " + time.strftime(
+                    "%Y %m %d %H:%M:%S", stats["rss"]["last"])
                 break
             else:
-                for s in [""+f.feed.title+": "+e.title] + html2text.html2text(e.summary).split("\n")[:8] + [e.link.strip("\n")]:
+                for s in ["" + f.feed.title + ": " + e.title] + html2text.html2text(e.summary).split("\n")[:8] + [
+                    e.link.strip("\n")]:
                     # print repr(s)
                     s = str(s.encode("iso8859_10", "ignore"))
                     server.privmsg(connection_info["channel"], s)
@@ -2132,12 +2143,12 @@ def auto_git_check():
 
 
 def tell_pie_jokes():
-    irc.execute_delayed(60*60*3, tell_pie_jokes)
+    irc.execute_delayed(60 * 60 * 3, tell_pie_jokes)
 
     joke = random.choice(pie_jokes)
     for chan in config.get("startup", "channels").split():
-        server.privmsg(chan, ""+joke[0])
-        irc.execute_delayed(10, server.privmsg, (chan, ""+joke[1]))
+        server.privmsg(chan, "" + joke[0])
+        irc.execute_delayed(10, server.privmsg, (chan, "" + joke[1]))
         irc.execute_delayed(11, server.privmsg, (
             chan, "http://www.youtube.com/watch?v=_Rav9ijyyZk"))
 
@@ -2203,6 +2214,7 @@ def initiate_cli():
         else:
             exec i in globals(), locals()
             f()
+
     t = threading.Thread(target=f)
     t.start()
 
@@ -2216,6 +2228,6 @@ if __name__ == "__main__":
     except Exception as e:
         print "Loading settings failed; ", e
         raise
-    # initiate_cli()
+        # initiate_cli()
     initiate_irc()
     save_settings()
