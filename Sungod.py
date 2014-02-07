@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import httplib
 
 import sys
 import traceback
@@ -1150,12 +1151,25 @@ class TextPreview(basecmd):
         s = "http://bbg.terminator.net/media/previews/" + f
         say(s, event.target)
 
+class IsDown(basecmd):
+    trigger = "down"
 
-builtincmds = [Statsmanip, JoinChan, PartChan, Query, Quote, DisplayHelp,
+    def do(self, args, connection, event):
+        link = " ".join(args)
+
+        conn = httplib.HTTPConnection(link)
+        conn.request("HEAD", "/")
+        is_up = conn.getresponse().status == 200
+        status = link + " seems to be " + (is_up and "UP" or "DOWN")
+
+        say(status, event.target)
+
+
+builtincmds = (Statsmanip, JoinChan, PartChan, Query, Quote, DisplayHelp,
                RandomQuote, TopSpeakers, DaysTG, Random, RPS, Exec, Get,
                Timer, Die, Spell, Charges, Dictionary, Top, DFmoral, RSS,
                UConvert, Pynify, Python, Ninjafy, gw2check, GetError, Restart, Time,
-               wob, Week, Wikipedia, wobHere, TextPreview]
+               wob, Week, Wikipedia, wobHere, TextPreview, IsDown)
 
 
 class Hooks():
