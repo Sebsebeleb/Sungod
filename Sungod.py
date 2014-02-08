@@ -1491,7 +1491,7 @@ def handlePubMessage(connection, event):
         connection.privmsg(
             event.target, "http://bbg.terminator.net/embarrasing.mp3")
 
-    m = re.search(r"r/\w+", message, re.IGNORECASE)
+    m = re.search(r"^r/\w+", message, re.IGNORECASE)
     if m:
         connection.privmsg(
             event.target, "http://www.reddit.com/" + m.group().strip(" "))
