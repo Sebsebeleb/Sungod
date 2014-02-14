@@ -1157,13 +1157,17 @@ class IsDown(basecmd):
     def do(self, args, connection, event):
         link = " ".join(args)
 
-        conn = httplib.HTTPConnection(link)
-        conn.request("HEAD", "/")
-        is_up = conn.getresponse().status == 200
-        status = link + " seems to be " + (is_up and "UP" or "DOWN")
+        def f():
+            timeout = 1
+            conn = httplib.HTTPConnection(link, timeout=1)
+            conn.request("HEAD", "/")
+            is_up = conn.getresponse().status == 200
+            status = link + " seems to be " + (is_up and "UP" or "DOWN (timeout is %f)".format(timeout))
 
-        say(status, event.target)
+            say(status, event.target)
 
+        t = threading.Thread(target=f)
+        t.start()
 
 builtincmds = (Statsmanip, JoinChan, PartChan, Query, Quote, DisplayHelp,
                RandomQuote, TopSpeakers, DaysTG, Random, RPS, Exec, Get,
