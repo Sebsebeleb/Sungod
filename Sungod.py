@@ -33,6 +33,12 @@ from libs import math_parse
 import math
 import json
 
+#very social media
+import Crypto
+from zipfile import is_zipfile, ZipFile
+from pysnap import Snapchat, get_file_extension
+
+
 htmlre = re.compile(
     r"\S+\.\S+")  # shouldn't these be wrapped in an anymous, self-referencing function call?
 spotre = re.compile(r"spotify:track:([A-Za-z0-9]{22})")
@@ -131,6 +137,7 @@ stats = {
                       r"http://api.twitter.com/1/statuses/user_timeline.rss?screen_name=BadlybadGames",
                       r"http://bbg.terminator.net/forums/syndication.php?limit=15"
             ]},
+    "snap": { "interval": 60 },
     "git": {"tag": None},
 }
 
@@ -2161,6 +2168,40 @@ def auto_git_check():
     git_check()
     irc.execute_delayed(stats["rss"]["interval"], auto_git_check)
 
+def sjekk_snap():
+    s = Snapchat()
+    s.login("Sungod_bokkfan",config.get("connection", "snapchatpass"))
+    path = '/home/seb/www/bbg.terminator.net/media/dumps/snap/'
+    dumppath = 'http://bbg.terminator.net/media/dumps/snap/'
+
+    for snap in s.get_snaps():
+        filename = '{0}_{1}.{2}'.format(snap['sender'], snap['id'],
+                                        get_file_extension(snap['media_type']))
+        abspath = os.path.abspath(os.path.join(path, filename))
+        if os.path.isfile(abspath):
+            break
+        data = s.get_blob(snap['id'])
+        if data is None:
+            break
+        with open(abspath, 'wb') as f:
+            f.write(data)
+
+        if is_zipfile(abspath):
+            zipped_snap = ZipFile(abspath)
+            unzip_dir = os.path.join(path, '{0}_{1}'.format(snap['sender'],
+                                                            snap['id']))
+            zipped_snap.extractall(unzip_dir)
+
+        server.privmsg("#wtf", "My sweet followers, a sign from me: " + dumppath+filename)
+        print "Melder " + filename + " til #wtf!"
+    print "[SNAP] Check completed."
+    return
+
+def auto_snap_check():
+    print "[SNAP] Checking"
+    sjekk_snap()
+    irc.execute_delayed(stats["snap"]["interval"], auto_snap_check)
+
 
 def tell_pie_jokes():
     irc.execute_delayed(60 * 60 * 3, tell_pie_jokes)
@@ -2198,7 +2239,8 @@ def initiate_irc():
     # irc.execute_delayed(60*20,tell_pie_jokes)
     # rss_check()
     # irc.execute_delayed(stats["rss"]["interval"],auto_rss_check)
-    irc.execute_delayed(stats["rss"]["interval"], auto_git_check)
+    #irc.execute_delayed(stats["rss"]["interval"], auto_git_check)
+    irc.execute_delayed(10, auto_snap_check) #let's start by checking snaps
 
     print connection_info["nickservpass"]
     server.privmsg("nickserv", connection_info["nickservpass"])
