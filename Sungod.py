@@ -2167,8 +2167,8 @@ def auto_git_check():
 def sjekk_snap():
     s = Snapchat()
     s.login("Sungod_bokkfan",config.get("connection", "snapchatpass"))
-    path = '/home/seb/www/bbg.terminator.net/media/dumps'
-    dumppath = 'http://bbg.terminator.net/media/dumps/'
+    path = '/home/seb/www/bbg.terminator.net/media/dumps/snap/'
+    dumppath = 'http://bbg.terminator.net/media/dumps/snap/'
 
     for snap in s.get_snaps():
         filename = '{0}_{1}.{2}'.format(snap['sender'], snap['id'],
