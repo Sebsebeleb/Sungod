@@ -1237,7 +1237,8 @@ def you_asked_memory(connection, event, asker):
     message = event.arguments[0]
 
     if speaker == asker:
-        sungod_says(message, connection, event, speaker)
+        answer = sungod_says(message, speaker=speaker, event=event)
+        say(answer, event.target)
         return True
     else:
         return False
@@ -1578,7 +1579,8 @@ def handlePubMessage(connection, event):
         else:
             if stats["smart_mode"]:
                 random.seed("".join(message.split(" ")[1:]))
-            sungod_says(message, connection, event, speaker)
+        answer = sungod_says(message, speaker=speaker, event=event)
+        say(answer, event.target)
     elif connection_info["prefix"] in message.split(" ")[-1] and len(message.split(" ")[-1]) == len(
             connection_info["prefix"]):
         # TO-BE-DONE-LATER: ^ Needs a better implementation. "What is
@@ -1588,7 +1590,8 @@ def handlePubMessage(connection, event):
         s = s.rstrip(",")
         if message[-1] in ["!", "?"]:
             s += message[-1]
-        sungod_says(s, connection, event, speaker)
+        answer = sungod_says(message, speaker=speaker, event=event)
+        say(answer, event.target)
     else:
         pass
 
@@ -1597,7 +1600,7 @@ def handlePubMessage(connection, event):
     previous_line = message
 
 
-def sungod_says(msg, connection, event, speaker):
+def sungod_says(msg, speaker, event=None):
     answer = "You make no sense"
     raw_str = msg.split(" ")
 
@@ -1672,7 +1675,8 @@ def sungod_says(msg, connection, event, speaker):
             answer = "Nothing went wrong, yet something went wrong. The bokk is a mysterious item."
 
     elif " has commited a crime!" in raw_str:
-        court(raw_str.split()[1], raw_str, event.target)
+        if event:
+            court(raw_str.split()[1], raw_str, event.target)
         return
 
     elif raw_str.startswith("how many"):
@@ -1975,8 +1979,7 @@ def sungod_says(msg, connection, event, speaker):
 
     if not answer:
         answer = "I do not have an answer, for some reason!"
-    connection.privmsg(event.target, answer)
-
+    return answer
 
 def court(speaker, message, chn):
     if speaker.lower() in [s.lower() for s in stats["users"].keys()]:
