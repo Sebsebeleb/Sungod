@@ -1,43 +1,82 @@
 # -*- coding: utf-8 -*-
-import httplib
-
 import sys
-import traceback
 import os
+import importlib
 
 sys.path.append(os.path.join("libs", "external"))
 
-import pickle as cPickle  # @UnusedImport HAHAHHAHAH LEARN TO USE IMPORTS PROPERLY
+
+class import_lazy(object):
+    """Lazily and safetly tries to load a module. An error message will be printed and no exceptions raised on a
+    that cannot be found, while an exception if tried to used after unsuccesful import"""
+
+    def __init__(self, module_name):
+        self.__dict__["_name"] = module_name
+        self.__dict__["_failed"] = False
+
+    def __getattr__(self, item):
+        if not self.__dict__.get("_failed"):
+            try:
+                return getattr(self.__dict__["_module"], item)
+            except KeyError:  # Module has not been loaded yet, lets load it now.
+                try:
+                    module = importlib.import_module(self.__dict__["_name"])
+                    self.__dict__["_module"] = module
+                    try:
+                        self.__dict__["__all__"] = module.__all__
+                    except AttributeError:
+                        pass
+                except ImportError as e:
+                    print "[MODULES] Error importing '{name}' ({reason}); some functionality may be unavailable or not " \
+                          "function properly".format(name=self.__dict__["_name"], reason=e)
+                    self.__dict__["_failed"] = True
+                else:
+                    return getattr(self.__dict__["_module"], item)
+        else:
+            raise ImportError("Lazy import could not load the module")
+
+    def __setattr__(self, key, value):
+        setattr(self.__dict__["_module"], key, value)
+
+    def __repr__(self):
+        if hasattr(self, "_module"):
+            return repr(self.__dict__["_module"])
+        elif self.__dict__["_failed"]:
+            return "<failed lazy import of {name}>".format(name=self.__dict__["_name"])
+        else:
+            return "<not-yet-loaded module: {m}>".format(m=repr(self.__dict__["_name"]))
+
+#Required modules are not loaded safely or lazily
+import irc.client as irclib
+
 import random
 import datetime
 import re
-import urllib
 import shelve
 import time
 from collections import deque
 import threading
 from subprocess import call
-
-import irc.client as irclib
-import feedparser
-from BeautifulSoup import BeautifulSoup
-import wikipedia
-# from libs.external import ConfigParser
-import ConfigParser  # should be in external
-import html2text
-
-from libs import PyNify
-from libs import arena
-from libs import math_parse
-# import libs.reddit as reddit
+import traceback
+import urllib
 import math
 import json
 
-#very social media
-import Crypto
-from zipfile import is_zipfile, ZipFile
-from pysnap import Snapchat, get_file_extension
+import ConfigParser
 
+# Lazy load optional modules
+pkgutil = import_lazy("pkgutil")
+httplib = import_lazy("httplib")
+feedparser = import_lazy("feedparser")
+wikipedia = import_lazy("wikipedia")
+BeautifulSoup = import_lazy("BeautifulSoup.BeautifulSoup")
+httplib = import_lazy("httplib")
+PyNify = import_lazy("libs.PyNify")
+html2text = import_lazy("html2text")
+arena = import_lazy("libs.arena")
+zipfile = import_lazy("zipfile")
+pysnap = import_lazy("pysnap")
+math_parse = import_lazy("libs.math_parse")
 
 htmlre = re.compile(
     r"\S+\.\S+")  # shouldn't these be wrapped in an anymous, self-referencing function call?
@@ -137,7 +176,7 @@ stats = {
                       r"http://api.twitter.com/1/statuses/user_timeline.rss?screen_name=BadlybadGames",
                       r"http://bbg.terminator.net/forums/syndication.php?limit=15"
             ]},
-    "snap": { "interval": 60 },
+    "snap": {"interval": 60},
     "git": {"tag": None},
 }
 
@@ -2052,8 +2091,6 @@ def load_commands(cmd):
 
 
 def load_hooks():
-    import pkgutil
-    import os
     import hooks
 
     for i in [name for _, name, _ in pkgutil.iter_modules(['hooks'])]:
@@ -2172,14 +2209,14 @@ def auto_git_check():
     irc.execute_delayed(stats["rss"]["interval"], auto_git_check)
 
 def sjekk_snap():
-    s = Snapchat()
+    s = pysnap.Snapchat()
     s.login("Sungod_bokkfan",config.get("connection", "snapchatpass"))
     path = '/home/seb/www/bbg.terminator.net/media/dumps/snap/'
     dumppath = 'http://bbg.terminator.net/media/dumps/snap/'
 
     for snap in s.get_snaps():
         filename = '{0}_{1}.{2}'.format(snap['sender'], snap['id'],
-                                        get_file_extension(snap['media_type']))
+                                        pysnap.get_file_extension(snap['media_type']))
         abspath = os.path.abspath(os.path.join(path, filename))
         if os.path.isfile(abspath):
             break
@@ -2189,8 +2226,8 @@ def sjekk_snap():
         with open(abspath, 'wb') as f:
             f.write(data)
 
-        if is_zipfile(abspath):
-            zipped_snap = ZipFile(abspath)
+        if zipfile.is_zipfile(abspath):
+            zipped_snap = zipfile.ZipFile(abspath)
             unzip_dir = os.path.join(path, '{0}_{1}'.format(snap['sender'],
                                                             snap['id']))
             zipped_snap.extractall(unzip_dir)
