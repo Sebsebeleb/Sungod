@@ -2232,7 +2232,7 @@ def sjekk_snap():
                                                             snap['id']))
             zipped_snap.extractall(unzip_dir)
 
-        server.privmsg("#wtf", "My sweet followers, a sign from me: " + dumppath+filename)
+        server.privmsg("#wtf", "My sweet followers, a sign from me: " + dumppath+filename)
         print "Melder " + filename + " til #wtf!"
     print "[SNAP] Check completed."
     return
