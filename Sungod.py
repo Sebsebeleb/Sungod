@@ -33,7 +33,7 @@ class import_lazy(object):
                 else:
                     return getattr(self.__dict__["_module"], item)
         else:
-            raise ImportError("Lazy import could not load the module")
+            raise ImportError("Lazy import could not load {name}".format(name=self.__dict__["_name"]))
 
     def __setattr__(self, key, value):
         setattr(self.__dict__["_module"], key, value)
