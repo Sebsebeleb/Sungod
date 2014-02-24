@@ -1205,10 +1205,10 @@ class IsDown(basecmd):
 
         def f():
             timeout = 1
-            conn = httplib.HTTPConnection(link, timeout=1)
+            conn = httplib.HTTPConnection(link, timeout=timeout)
             conn.request("HEAD", "/")
             is_up = conn.getresponse().status == 200
-            status = link + " seems to be " + (is_up and "UP" or "DOWN (timeout is %f)".format(timeout))
+            status = link + " seems to be " + (is_up and "UP" or "DOWN (timeout is {timeout})".format(timeout=timeout))
 
             say(status, event.target)
 
