@@ -5,6 +5,8 @@ import importlib
 
 sys.path.append(os.path.join("libs", "external"))
 
+class LazyImportError(Exception):
+    pass
 
 class import_lazy(object):
     """Lazily and safetly tries to load a module. An error message will be printed and no exceptions raised on a
@@ -33,7 +35,7 @@ class import_lazy(object):
                 else:
                     return getattr(self.__dict__["_module"], item)
         else:
-            raise ImportError("Lazy import could not load {name}".format(name=self.__dict__["_name"]))
+            raise LazyImportError("Lazy import could not load {name}".format(name=self.__dict__["_name"]))
 
     def __setattr__(self, key, value):
         setattr(self.__dict__["_module"], key, value)
@@ -2052,11 +2054,9 @@ def court(speaker, message, chn):
 # init stuff
 #
 
-def on_disconnected(socket):
-    global server
+def handle_disconnect(connection, event):
     print "[WARNING] lost connection"
-    server.connect(connection_info["network"], connection_info[
-        "port"], connection_info["nick"], ircname=connection_info["name"])
+    connect()
 
 
 def load_commands(cmd):
@@ -2239,8 +2239,12 @@ def sjekk_snap():
 
 def auto_snap_check():
     print "[SNAP] Checking"
-    sjekk_snap()
-    irc.execute_delayed(stats["snap"]["interval"], auto_snap_check)
+    try:
+        sjekk_snap()
+    except LazyImportError:
+        print "[SNAP] Could not load snap module, no more checks."
+    else:
+        irc.execute_delayed(stats["snap"]["interval"], auto_snap_check)
 
 
 def tell_pie_jokes():
@@ -2254,6 +2258,13 @@ def tell_pie_jokes():
             chan, "http://www.youtube.com/watch?v=_Rav9ijyyZk"))
 
 
+def connect():
+    server.connect(connection_info["network"], connection_info[
+        "port"], connection_info["nick"], ircname=connection_info["name"])
+    for chan in config.get("startup", "channels").split():
+        server.join(chan)
+
+
 def initiate_irc():
     # Create an IRC object
 
@@ -2261,18 +2272,15 @@ def initiate_irc():
 
     # Create a server object, connect and join the channel
     global server, connection_info, stats, irc
-    irc = irclib.IRC(on_disconnect=on_disconnected)
+    irc = irclib.IRC()
     server = irc.server()
-    server.connect(connection_info["network"], connection_info[
-        "port"], connection_info["nick"], ircname=connection_info["name"])
-    for chan in config.get("startup", "channels").split():
-        server.join(chan)
-
+    connect()
     connection_info["server"] = server
 
     irc.add_global_handler('privmsg', handlePrivMessage)
     irc.add_global_handler('pubmsg', handlePubMessage)
     irc.add_global_handler('join', handleJoin)
+    irc.add_global_handler('disconnect', handle_disconnect)
 
     print stats["autosave_interval"]
     irc.execute_delayed(stats["autosave_interval"], auto_save)
@@ -2293,6 +2301,8 @@ def initiate_irc():
     while True:
         try:
             irc.process_forever()
+        except LazyImportError:
+            pass
         except Exception as e:
 
             stats["error"] = e.message
