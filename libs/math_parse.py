@@ -10,11 +10,17 @@ allowed = (ast.Num, ast.Str, ast.List, ast.Tuple, ast.Dict, ast.Expression,
            )
 
 
-def parse(string):
-    tree = ast.parse(string, mode='eval')
-    nodes = list(ast.walk(tree))  # Shouldn't this be "climb(tree)" instead?
-    print nodes
-    s = None
-    if all((type(i) in allowed for i in nodes)):
-        s = eval(compile(tree, filename="<ast>", mode="eval"))
-    return s 
+def parse(string, power):
+    expr = string
+    if power != 0:
+        tree = ast.parse(string, mode='eval')
+        nodes = list(ast.walk(tree))  # Shouldn't this be "climb(tree)" instead?
+        if all((type(i) in allowed for i in nodes)):
+            expr = compile(tree, filename="<ast>", mode="eval")
+        else:
+            expr = None
+
+    if expr:
+        import numpy
+        expr = eval(expr, {"np":numpy})
+    return expr

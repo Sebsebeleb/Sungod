@@ -327,8 +327,6 @@ class Statsmanip(basecmd):
     trigger = "set"
     powerreq = 2
 
-    print stats["users"]
-
     def do(self, args, connection, event):
         try:
             if len(args) == 3:
@@ -586,11 +584,14 @@ class DaysTG(basecmd):
     """() Displays the time untill TG"""
     trigger = "tg"
 
-    tgtime = datetime.datetime(2013, 4, 4, 9)
 
     def do(self, args, connection, event):
         now = datetime.datetime.now()
-        difference = self.tgtime - now
+        tgtime = datetime.datetime(now.year, 4, 4, 9)
+        difference = tgtime - now
+        if difference.days < 0:
+            tgtime = datetime.datetime(now.year+1, 4, 4, 9)
+            difference = tgtime - now
         connection.privmsg(event.target, str(difference).partition(".")[0])
 
 
@@ -1436,8 +1437,9 @@ def handlePubMessage(connection, event):
 
     m = re_math.match(message)
     if m:
-        result = math_parse.parse(message)
-        if result and str(result) != message:
+        power = int(stats["users"][speaker].power)
+        result = math_parse.parse(message, power)
+        if result is not None and str(result) != message:
             say(result, event.target)
 
     link = htmlre.search(message)
