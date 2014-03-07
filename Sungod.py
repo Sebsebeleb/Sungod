@@ -809,6 +809,7 @@ class Restart(basecmd):
         server.disconnect()
         call(["git", "pull", "origin"])
         os.execl(proc, proc, *sys.argv)
+        os.kill(os.getpid(), 0)
 
 
 class RPS(basecmd):
